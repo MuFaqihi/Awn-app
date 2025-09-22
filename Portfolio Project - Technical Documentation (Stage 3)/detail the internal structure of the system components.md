@@ -1,8 +1,3 @@
-# Medical Services System
-
-## Overview
-A medical services platform with distinct dashboards for Patients, Doctors, and Admins, providing appointment management, medical record tracking, and billing functionalities.
-
 ## Back-end Classes
 
 ### User (Base Class)
