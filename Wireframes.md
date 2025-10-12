@@ -1,50 +1,37 @@
- -------------------------------------------------
-|                 Medical Services                |
-|-------------------------------------------------|
-|                [ Login to Account ]             |
-|                                                 |
-|   Email:     [______________________]           |
-|   Password:  [______________________]           |
-|                                                 |
-|              [ Login Button ]                   |
-|                                                 |
-|      Forgot password?   Create new account      |
- -------------------------------------------------
+### Login to Account
+
+| Field     | Input                      |
+|-----------|----------------------------|
+| Email     | [______________________]   |
+| Password  | [______________________]   |
+
+[Login Button]  
+Forgot password? Create new account
 
 
- -------------------------------------------------
-| Medical Services |  [Logout]                    |
-|-------------------------------------------------|
-|  Welcome, Dr. Ahmed                             |
-|-------------------------------------------------|
-|  Patient Info                                   |
-|  ---------------------------------------------  |
-|  Name: osama asd                                |
-|  Age: 42                                        |
-|  Blood Type: O+                                 |
-|                                                 |
-|  Medical History                                |
-|  ---------------------------------------------  |
-|  - Diabetes                                     |
-|  - Hypertension                                 |
-|                                                 |
-|  [ View Reports ]   [ Book Appointment ]        |
- -------------------------------------------------
+#### Patient Info
 
+| Name       | osama asd     |
+|------------|---------------|
+| Age        | 42            |
+| Blood Type | O+            |
 
-  -------------------------------------------------
-| Medical Services |  [Back to Record]            |
-|-------------------------------------------------|
-|  Book Appointment                               |
-|-------------------------------------------------|
-|  Select Doctor:  [ Dropdown: Dr. Ahmed ▼ ]      |
-|  Date:           [ 12 / 10 / 2025 ]             |
-|  Time:           [ 10:00 AM ▼ ]                 |
-|  Section:        [Nerves▼]                      |
-|  [ Confirm Appointment ]                        |
-|                                                 |
-|  Upcoming Appointments:                         |
-|  ---------------------------------------------  |
-|  Dr. Ahmed - 12 Oct 2025 - 10:00 AM             |
- -------------------------------------------------
+#### Medical History
+- Diabetes
+- Hypertension
 
+[View Reports]   [Book Appointment]
+
+### Book Appointment
+
+- **Select Doctor:** Dr. Ahmed  
+- **Date:** 12 / 10 / 2025  
+- **Time:** 10:00 AM  
+- **Section:** Nerves  
+
+[Confirm Appointment]
+
+#### Upcoming Appointments
+- Dr. Ahmed – 12 Oct 2025 – 10:00 AM
+
+[Back to Record]
