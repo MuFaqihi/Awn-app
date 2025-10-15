@@ -7,33 +7,35 @@ Each screen was designed to align with the platform’s accessibility goals and 
 
 ### 🩵 Splash Screen
 A minimal intro with the Arabic brand name "عون" centered on a calming teal gradient background.  
-![Splash Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/splash-screen.png)
+![Splash Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/First-Screen.png)
 
 ---
 
 ### 🔐 Welcome & Login Screens
 Simple, bilingual-friendly onboarding. Users can log in using email, mobile, or biometric authentication.  
-![Login Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/login-screen.png)
+![Login Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/Log-in.png)
 
 ---
 
 ### 🏠 Home / Therapist Directory
 Displays a list of verified Saudi physiotherapists with rating, location, and specialization filters.  
-![Home Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/home-screen.png)
+![Home Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/Home.png)
 
 ---
 
 ### 👩‍⚕️ Therapist Profile
 Shows therapist bio, SCFHS verification, experience, and booking calendar.  
-![Therapist Info](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/therapist-info.png)
+![Therapist Info](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/Doctors-1.png)
 
 ---
 
 ### 💬 Chat Interface
 Secure message interface between patient and therapist, supports text and voice notes.  
-![Chat Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/chat-screen.png)
+![Chat Screen](https://github.com/MuFaqihi/Awn-app/blob/main/awn-mockups/Message.png)
 
 ---
+### All of the UI 
+
 
 ### 🧭 Design Notes
 - **Typography:** Noto Sans Arabic / Poppins for bilingual support  
