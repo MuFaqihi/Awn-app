@@ -1,0 +1,91 @@
+@import "tailwindcss";
+/* if you installed it:  @import "tw-animate-css"; */
+
+/* --- Design tokens --- */
+:root {
+    /* CTA dark blue shades */
+  --cta: #013D5B;
+  --cta-hover: #02486B;
+  --cta-active: #012E45;
+  --cta-foreground: #ffffff;
+  --font-cairo: "Cairo", system-ui, sans-serif;
+
+  --radius: 10px;
+
+  /* neutrals */
+  --background: #ffffff;
+  --foreground: #121212;
+  --border: #e5e7eb;
+  --ring: #a3a3a3;
+
+  /* brand */
+  --primary: #35757F;                 /* teal you used */
+  --primary-foreground: #ffffff;
+
+  --accent:  #E2A674;                 /* secondary sand */
+  --accent-foreground: #1a1a1a;
+
+  /* optional supporting */
+  --teal: #30846D;
+
+  /* hero background like old project */
+  --hero-bg: radial-gradient(600px 600px at 15% 20%, #35757F 0%, #D4FCFF 70%, transparent 100%),
+             radial-gradient(600px 600px at 85% 15%, #D4FCFF 0%, transparent 70%);
+}
+
+/* dark mode */
+.dark {
+  --background: #0f1416;
+  --foreground: #f5f7f7;
+  --border: #263238;
+  --ring: #7b8790;
+
+  --primary: #2e636b;
+  --primary-foreground: #f4f7f7;
+
+  --accent: #c69364;
+  --accent-foreground: #0f1416;
+
+  --hero-bg: radial-gradient(600px 600px at 15% 20%, #2e636b 0%, #1b2c30 70%, transparent 100%),
+             radial-gradient(600px 600px at 85% 15%, #1b2c30 0%, transparent 70%);
+}
+
+/* RTL helper */
+html[dir="rtl"] body { direction: rtl; }
+
+/* === Map tokens to Tailwind (v4) === */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+   --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-cta-active: var(--cta-active);
+  --color-cta-foreground: var(--cta-foreground);
+}
+
+/* === Base layer === */
+@layer base {
+  * { @apply border-border outline-ring/50; }
+
+  body {
+    @apply bg-background text-foreground antialiased min-h-dvh;
+    font-family: var(--font-cairo);
+
+    /* optional: global hero background like your old app header section */
+    /* comment this out if you only want the gradient on the hero header container */
+    /* background-image: var(--hero-bg); */
+  }
+}
