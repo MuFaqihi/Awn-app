@@ -15,7 +15,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         hCoverage: 'النطاق الجغرافي',
         pCoverage: 'نغطّي الرياض أولًا، مع التوسّع لاحقًا.',
         cta1: 'احجز جلسة',
-        cta2: 'سجّل كمعالج',
+        cta2:'انضم كمختص',
       }
     : {
         h1: 'About Awn',
@@ -27,7 +27,7 @@ export default function AboutPage({ params }: { params: { locale: Locale } }) {
         hCoverage: 'Coverage',
         pCoverage: 'Riyadh first, expanding soon.',
         cta1: 'Start Booking',
-        cta2: 'Sign up as Therapist',
+        cta2: 'Join as Therapist',
       };
 
   return (
