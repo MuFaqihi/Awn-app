@@ -99,9 +99,9 @@ const bookingDays = [
   { ar: "الخميس 23", en: "Thursday 23" },
   { ar: "الجمعة 24", en: "Friday 24" },
   { ar: "السبت 25", en: "Saturday 25" },
-  { ar: "الأحد", en: "Sunday" },
-  { ar: "الاثنين", en: "Monday" },
-  { ar: "الثلاثاء", en: "Tuesday" },
+  { ar: "26 الأحد", en: "Sunday 26" },
+  { ar: "27 الاثنين", en: "Monday 27" },
+  { ar: "28 الثلاثاء", en: "Tuesday 28" },
 ];
 
 const bookingTimes = [

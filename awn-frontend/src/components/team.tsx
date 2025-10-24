@@ -66,7 +66,7 @@ export default function TeamSection({
       slug: "amani-aldosari",
       name: { ar: "أماني الدوسري", en: "Amani Al-Dosari" },
       role: { ar: "أخصائية علاج طبيعي للمسنين", en: "Geriatric Physical Therapist" },
-      avatar: "\images\therapists\Amani.png",
+      avatar: "/images/therapists/Amani.png",
       gender: "female",
       specialty: "geriatrics",
       session: "online",
