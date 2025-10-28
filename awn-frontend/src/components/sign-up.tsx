@@ -1,147 +1,159 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
-import { LogoIcon } from '@/components/logo';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AnimatedOTPInput } from '@/components/ui/AnimatedOTPInput';
 
 type Locale = 'ar' | 'en';
-type Dict = {
-  title: string;
-  subtitle: string;
-  first: string;
-  last: string;
-  email: string;
-  password: string;
-  signUp: string;
-  orContinue: string;
-  google: string;
-  microsoft: string;
-  haveAccount: string;
-  signIn: string;
-};
 
-const AR: Dict = {
+const AR = {
   title: 'إنشاء حساب في عون',
   subtitle: 'مرحبًا بك! أنشئ حسابك للبدء.',
   first: 'الاسم الأول',
   last: 'اسم العائلة',
-  email: 'رقم الجوال',
+  phone: 'رقم الجوال',
   password: 'كلمة المرور',
   signUp: 'إنشاء الحساب',
-  orContinue: 'أو المتابعة عبر',
-  google: 'Google',
-  microsoft: 'Microsoft',
   haveAccount: 'لديك حساب مسبقًا؟',
   signIn: 'تسجيل الدخول',
+  otpTitle:'أدخل رمز التحقق',
+  otpHelp:'أرسلنا رمزًا مكوّنًا من 6 أرقام إلى جوالك.',
+  resend:'إعادة الإرسال', back:'رجوع',
 };
-
-const EN: Dict = {
+const EN = {
   title: 'Create your Awn account',
   subtitle: 'Welcome! Create an account to get started.',
   first: 'First name',
   last: 'Last name',
-  email: 'Phone number',
+  phone: 'Phone number',
   password: 'Password',
   signUp: 'Sign Up',
-  orContinue: 'Or continue with',
-  google: 'Google',
-  microsoft: 'Microsoft',
   haveAccount: 'Already have an account?',
   signIn: 'Sign in',
+  otpTitle:'Enter verification code',
+  otpHelp:'We sent a 6-digit code to your phone.',
+  resend:'Resend code', back:'Back',
 };
 
-export default function SignUpPage({
-  locale = 'ar',
-  dict,
-}: {
-  locale?: Locale;
-  dict?: Partial<Dict>;
-}) {
-  const t: Dict = { ...(locale === 'ar' ? AR : EN), ...(dict || {}) };
+export default function SignUpPage({ locale = 'ar' }: { locale?: Locale }) {
+  const t = locale === 'ar' ? AR : EN;
   const isRTL = locale === 'ar';
+  const router = useRouter();
+  const sp = useSearchParams();
+  const next = sp.get('next') || `/${locale}/dashboard`;
+const [step, setStep] = React.useState<'form' | 'otp'>('form');
+const [otp, setOtp] = React.useState('');
+const [resendIn, setResendIn] = React.useState(0); // Add this line
+const canVerify = /^\d{6}$/.test(otp);
+
+React.useEffect(() => {
+  if (step !== 'otp') return;
+  setResendIn(30);
+  const id = setInterval(() => setResendIn(s => (s > 0 ? s - 1 : 0)), 1000);
+  return () => clearInterval(id);
+}, [step]);
+
+function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+
+  const form = e.currentTarget as HTMLFormElement;
+  const phoneInput = form.querySelector<HTMLInputElement>('#phone');
+  const phone = phoneInput?.value || '';
+
+  const next = `/${locale}/dashboard`;
+  router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
+}
+  function handleOtpComplete(code: string) {
+    // TODO: verify OTP
+    router.push(next);
+  }
 
   return (
     <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent" dir={isRTL ? 'rtl' : 'ltr'}>
-      <form
-        action=""
-        className="m-auto w-full max-w-sm overflow-hidden rounded-xl border bg-muted shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
-      >
-        <div className="bg-card -m-px rounded-xl border p-8 pb-6">
+      <form onSubmit={onSubmit} className="m-auto w-full max-w-[28rem] sm:max-w-md md:max-w-lg overflow-hidden rounded-2xl border bg-card shadow-md">
+        <div className="bg-card -m-px rounded-2xl border p-8 sm:p-10">
           <div className="text-center">
             <Link href={`/${locale}`} aria-label="home" className="mx-auto block w-fit">
-              <LogoIcon />
+              <Logo />
             </Link>
-            <h1 className="mb-1 mt-4 text-xl font-semibold">{t.title}</h1>
+            <h1 className="mb-1 mt-4 text-2xl font-semibold">{t.title}</h1>
             <p className="text-sm text-muted-foreground">{t.subtitle}</p>
           </div>
 
-          {/* Form fields */}
-          <div className="mt-6 space-y-6">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="firstname" className="block text-sm">{t.first}</Label>
-                <Input id="firstname" name="firstname" type="text" required />
+          {step === 'form' && (
+            <div className="mt-6 space-y-6">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="firstname" className="block text-sm">{t.first}</Label>
+                  <Input id="firstname" name="firstname" type="text" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastname" className="block text-sm">{t.last}</Label>
+                  <Input id="lastname" name="lastname" type="text" required />
+                </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="lastname" className="block text-sm">{t.last}</Label>
-                <Input id="lastname" name="lastname" type="text" required />
+                <Label htmlFor="phone" className="block text-sm">{t.phone}</Label>
+                <div className="flex">
+                  <span className="inline-flex items-center justify-center rounded-s-md border bg-muted px-3 text-sm text-muted-foreground">+966</span>
+                  <Input id="phone" name="phone" type="tel" required className="rounded-s-none" inputMode="tel" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="block text-sm">{t.password}</Label>
+                <Input id="password" name="password" type="password" required autoComplete="new-password" />
+              </div>
+
+              {/* The actual SIGN UP button (inside the form) */}
+              <Button type="submit" className="w-full h-11 text-base">{t.signUp}</Button>
+
+              <p className="text-center text-sm text-accent-foreground">
+                {t.haveAccount}{' '}
+                <Link
+                  href={`/${locale}/login?next=${encodeURIComponent(next)}`}
+                  className="font-medium text-[oklch(45%_0.08_240)] transition-colors hover:text-[oklch(55%_0.1_240)] active:opacity-80"
+                >
+                  {t.signIn}
+                </Link>
+              </p>
+            </div>
+          )}
+
+          {step === 'otp' && (
+            <div className="mt-8 space-y-6">
+              <div className="text-center">
+                <h2 className="text-lg font-semibold">{t.otpTitle}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t.otpHelp}</p>
+              </div>
+              <div className="flex justify-center">
+                <AnimatedOTPInput value={otp} onChange={setOtp} onComplete={handleOtpComplete} maxLength={6} />
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <button type="button" onClick={() => setStep('form')} className="transition-colors text-muted-foreground hover:text-foreground">
+                  {t.back}
+                </button>
+                <button
+                  type="button"
+                  disabled={resendIn > 0}
+                  onClick={() => setResendIn(30)}
+                  className="transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+                >
+                  {resendIn > 0 ? `${t.resend} (${resendIn})` : t.resend}
+                </button>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="block text-sm">{t.email}</Label>
-              <Input id="email" name="email" type="email" required autoComplete="username" />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="block text-sm">{t.password}</Label>
-              <Input id="password" name="password" type="password" required autoComplete="new-password" />
-            </div>
-
-            <Button type="submit" className="w-full">{t.signUp}</Button>
-          </div>
-
-          {/* Divider */}
-          <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <hr className="border-dashed" />
-            <span className="text-xs text-muted-foreground">{t.orContinue}</span>
-            <hr className="border-dashed" />
-          </div>
-
-          {/* Social buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button type="button" variant="outline" className="gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="0.98em" height="1em" viewBox="0 0 256 262">
-                <path fill="#4285f4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
-                <path fill="#34a853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"></path>
-                <path fill="#fbbc05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z"></path>
-                <path fill="#eb4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
-              </svg>
-              <span>{t.google}</span>
-            </Button>
-
-            <Button type="button" variant="outline" className="gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256">
-                <path fill="#f1511b" d="M121.666 121.666H0V0h121.666z"></path>
-                <path fill="#80cc28" d="M256 121.666H134.335V0H256z"></path>
-                <path fill="#00adef" d="M121.663 256.002H0V134.336h121.663z"></path>
-                <path fill="#fbbc09" d="M256 256.002H134.335V134.336H256z"></path>
-              </svg>
-              <span>{t.microsoft}</span>
-            </Button>
-          </div>
+          )}
         </div>
-
-        <div className="p-3">
-          <p className="text-center text-sm text-accent-foreground">
-            {t.haveAccount}{' '}
-            <Button asChild variant="link" className="px-1">
-              <Link href={`/${locale}/login`}>{t.signIn}</Link>
-            </Button>
-          </p>
-        </div>
+        <Button type="submit" className="w-full h-11">
+  {t.signUp}
+</Button>
       </form>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";  // 👈 نستخدم hook use
+import { use } from "react";  
 import { useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import TeamSection from "@/components/team";
@@ -8,7 +8,6 @@ import SearchBar from "@/components/SearchBar";
 import TherapistFilter from "@/components/TherapistFilter";
 
 export default function TherapistsPage({ params }: { params: Promise<{ locale: Locale }> }) {
-  // 👇 هنا نفك params باستخدام use()
   const { locale } = use(params);
 
   const [searchQuery, setSearchQuery] = useState("");
