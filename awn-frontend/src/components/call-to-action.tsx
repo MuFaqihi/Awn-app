@@ -1,14 +1,14 @@
 // src/components/call-to-action.tsx
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import {
   ShieldCheck,
   CalendarCheck2,
   Home,
   ChevronRight,
   ChevronLeft,
-} from 'lucide-react';
+} from 'lucide-react'
 
 type Locale = 'ar' | 'en';
 
@@ -24,7 +24,6 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
           'ابحث عن الأخصائي المرخّص المناسب لك واحجز موعدك بسهولة — في العيادة، بالمنزل، أو أونلاين.',
         primary: 'ابدأ الحجز الآن',
         secondary: 'تسجيل دخول المختصّين',
-        
         fine: 'لا حاجة لتطبيق — كل شيء من متصفحك.',
       }
     : {
@@ -33,7 +32,6 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
           'Find a licensed therapist and book in minutes — in-clinic, at home, or online.',
         primary: 'Start booking',
         secondary: 'Therapist sign-in',
-       
         fine: 'No app required — everything in your browser.',
       };
 
@@ -79,10 +77,6 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
           </div>
 
           <p className="mt-3 text-sm text-muted-foreground">{t.fine}</p>
-   
-
-       
-       
         </div>
       </div>
     </section>
