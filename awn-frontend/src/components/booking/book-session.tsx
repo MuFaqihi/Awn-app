@@ -3,11 +3,19 @@
 import * as React from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import LoginPage from "@/components/login";
+import SignUpPage from "@/components/sign-up";
+
+
 import {
   ChevronRight,
   ChevronLeft,
@@ -18,26 +26,24 @@ import {
   CalendarDays,
   CreditCard,
   UserRound,
-  LogIn,
 } from "lucide-react";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 type Locale = "ar" | "en";
 type Step = 0 | 1 | 2;
 
 const BLUE = "#013D5B";
 
-/* ────────────────────────────────────────────────────────────────────────────
-  Translations
-──────────────────────────────────────────────────────────────────────────── */
+/* i18n */
 const t = {
   ar: {
     title: "حجز جلسة فورية",
@@ -49,7 +55,8 @@ const t = {
     howFeel: "بماذا تشعر؟",
     howFeelHint: "يمكنك اختيار ٣ خيارات على الأكثر",
     describe: "صف حالتك بشكل مختصر",
-    describePh: "ما هي الأعراض؟ كيف تؤثر على حياتك؟ مهتم/ة بماذا تحديدًا لدى الأخصائي؟",
+    describePh:
+      "ما هي الأعراض؟ كيف تؤثر على حياتك؟ مهتم/ة بماذا تحديدًا لدى الأخصائي؟",
     chars: "حرف",
     next: "التالي",
     back: "السابق",
@@ -57,12 +64,22 @@ const t = {
     home: "زيارة منزلية (الرياض فقط)",
     clinic: "في العيادة",
     online: "أونلاين",
+    preferredDate: "التاريخ المفضّل",
+    pickDate: "اختر تاريخًا",
     payTitle: "الدفع",
     name: "الاسم الكامل",
     cardNo: "رقم البطاقة",
     exp: "MM/YY",
     cvv: "CVV",
+    agree: "أوافق على الشروط والأحكام",
     payNow: "ادفع الآن",
+    mustLoginTitle: "تسجيل الدخول مطلوب",
+    mustLoginText:
+      "لا يمكن المتابعة بدون تسجيل الدخول. من فضلك سجّل الدخول أو أنشئ حسابًا جديدًا.",
+    login: "تسجيل الدخول",
+    signup: "إنشاء حساب",
+    continueGuest: "متابعة كضيف (تعطيل)",
+    // ADD THIS:
     chips: [
       "آلام الظهر",
       "إصابات رياضية",
@@ -74,26 +91,6 @@ const t = {
       "تأهيل ما بعد الولادة",
       "مشاكل الأطفال الحركية",
     ],
-    mustLoginTitle: "الرجاء تسجيل الدخول",
-    mustLoginDesc: "للاستمرار في الحجز يجب تسجيل الدخول أو إنشاء حساب.",
-    login: "تسجيل الدخول",
-    signup: "إنشاء حساب",
-    or: "أو",
-    quickLogin: "تسجيل سريع",
-    switchToSignup: "إنشاء حساب جديد",
-    switchToLogin: "العودة لتسجيل الدخول",
-    // Auth form translations
-    emailLabel: "البريد الإلكتروني (أو رقم الهوية)",
-    emailPlaceholder: "example@email.com",
-    passwordLabel: "كلمة المرور",
-    nameLabel: "الاسم الكامل",
-    namePlaceholder: "أدخل اسمك الكامل",
-    confirmPasswordLabel: "تأكيد كلمة المرور",
-    signIn: "تسجيل الدخول",
-    signUp: "إنشاء حساب",
-    orContinue: "أو المتابعة عبر",
-    google: "Google",
-    microsoft: "Microsoft",
   },
   en: {
     title: "Instant booking",
@@ -105,7 +102,8 @@ const t = {
     howFeel: "What do you feel?",
     howFeelHint: "You can select up to 3",
     describe: "Describe your case briefly",
-    describePh: "Symptoms, how it affects life, what you prefer in a therapist…",
+    describePh:
+      "Symptoms, how it affects life, and what you prefer in a therapist…",
     chars: "chars",
     next: "Next",
     back: "Back",
@@ -113,12 +111,22 @@ const t = {
     home: "Home visit (Riyadh only)",
     clinic: "In clinic",
     online: "Online",
+    preferredDate: "Preferred date",
+    pickDate: "Pick a date",
     payTitle: "Payment",
     name: "Full name",
     cardNo: "Card number",
     exp: "MM/YY",
     cvv: "CVV",
+    agree: "I agree to the Terms & Conditions",
     payNow: "Pay now",
+    mustLoginTitle: "Login required",
+    mustLoginText:
+      "You need to be logged in to continue. Please sign in or create a new account.",
+    login: "Log in",
+    signup: "Create account",
+    continueGuest: "Continue as guest (disabled)",
+    // ADD THIS:
     chips: [
       "Low back pain",
       "Sports injury",
@@ -130,30 +138,10 @@ const t = {
       "Postpartum rehab",
       "Pediatric motor issues",
     ],
-    mustLoginTitle: "Please log in",
-    mustLoginDesc: "You need to log in or create an account to continue booking.",
-    login: "Log in",
-    signup: "Sign up",
-    or: "or",
-    quickLogin: "Quick login",
-    switchToSignup: "Create new account",
-    switchToLogin: "Back to login",
-    // Auth form translations
-    emailLabel: "Email (or National ID)",
-    emailPlaceholder: "example@email.com",
-    passwordLabel: "Password",
-    nameLabel: "Full name",
-    namePlaceholder: "Enter your full name",
-    confirmPasswordLabel: "Confirm password",
-    signIn: "Sign In",
-    signUp: "Sign Up",
-    orContinue: "Or continue with",
-    google: "Google",
-    microsoft: "Microsoft",
   },
 } as const;
 
-/* clamp helper keeps Step as 0|1|2 and silences TS complaints */
+/* helpers */
 function clampStep(n: number): Step {
   if (n <= 0) return 0;
   if (n >= 2) return 2;
@@ -163,36 +151,46 @@ function clampStep(n: number): Step {
 export default function BookSession({ locale = "ar" as Locale }) {
   const i18n = t[locale];
   const isRTL = locale === "ar";
+  const dir = isRTL ? "rtl" : "ltr";
 
-  // Move hook calls inside the component
+  // --- fake auth (replace with real auth later)
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  // keep “isLoggedIn” in query for demo (so refresh preserves)
+  const router = useRouter();
   const pathname = usePathname();
-  const sp = useSearchParams();
-  const full = `${pathname}${sp.toString() ? `?${sp.toString()}` : ""}`;
-  const next = encodeURIComponent(full);
+  const params = useSearchParams();
 
-  // ⬇️ AUTH STUB: wire this to real auth later (e.g. NextAuth useSession)
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [showLoginModal, setShowLoginModal] = React.useState(false);
-  const [authMode, setAuthMode] = React.useState<"login" | "signup">("login");
-
-  // state
+  // --- form state
   const [step, setStep] = React.useState<Step>(0);
   const [gender, setGender] = React.useState<"male" | "female" | "any">("any");
   const [tags, setTags] = React.useState<string[]>([]);
   const [note, setNote] = React.useState("");
   const [type, setType] = React.useState<"home" | "clinic" | "online">("clinic");
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [agree, setAgree] = React.useState(false);
+const [authOpen, setAuthOpen] = React.useState(false);
+const [authMode, setAuthMode] = React.useState<'login' | 'signup'>('login');
+const [logged, setLogged] = React.useState(false); 
+
+  // --- login gate modal
+  const [showLoginGate, setShowLoginGate] = React.useState(false);
 
   // persist in URL (so refresh keeps choices)
-  const router = useRouter();
-  const params = useSearchParams();
   React.useEffect(() => {
     const sp = new URLSearchParams(params.toString());
     sp.set("step", String(step));
     sp.set("gender", gender);
     sp.set("type", type);
+    sp.set("logged", isLoggedIn ? "1" : "0");
     router.replace(`${pathname}?${sp.toString()}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, gender, type]);
+  }, [step, gender, type, isLoggedIn]);
+
+  // restore login demo flag on first render (optional)
+  React.useEffect(() => {
+    if (params.get("logged") === "1") setIsLoggedIn(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleTag = (v: string) =>
     setTags((curr) =>
@@ -204,49 +202,66 @@ export default function BookSession({ locale = "ar" as Locale }) {
     );
 
   const canNext =
-    step === 0 ? true : step === 1 ? true : note.trim().length >= 0; // tweak validation if needed
+    step === 0
+      ? true
+      : step === 1
+      ? true
+      : note.trim().length >= 0; // keep your current logic
 
-  // ⬇️ only change: wrap "go next" with login gate
-  const goNext = () => {
-    if (!isAuthenticated && step === 0) {
-      setAuthMode("login");
-      setShowLoginModal(true);
+  // next handler – blocks moving to step 2 if not logged in
+  const handleNext = () => {
+    if (step === 0 && !isLoggedIn) {
+      setShowLoginGate(true);
       return;
     }
-    setStep((prev) => clampStep(prev + 1));
+    if (canNext) setStep((prev) => clampStep(prev + 1));
   };
-
-  // Handle successful authentication
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
-    setShowLoginModal(false);
-    // Continue to next step
-    setStep((prev) => clampStep(prev + 1));
-  };
-
-  const handleAuthSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Replace with real auth logic
-    handleAuthSuccess();
-  };
-
-  const dir = isRTL ? "rtl" : "ltr";
 
   return (
     <section dir={dir} className="space-y-6">
-      {/* Sticky sub-header (steps) */}
-      <div
-        className="sticky top-[4.25rem] z-10 rounded-xl border bg-white/70 backdrop-blur-md dark:bg-zinc-900/70"
-        style={{ borderColor: "color-mix(in oklab, var(--color-border), transparent 0%)" }}
-      >
-        <Stepper current={step} labels={i18n.steps} rtl={isRTL} />
+      {/* top strip: Stepper + demo login toggle (replace with your real header auth later) */}
+      <div className="sticky top-[4.25rem] z-10 rounded-xl border bg-white/70 backdrop-blur-md dark:bg-zinc-900/70">
+        <div className="flex items-center justify-between gap-3 px-2 sm:px-4">
+          <Stepper current={step} labels={i18n.steps} rtl={isRTL} />
+          {/* demo auth buttons */}
+          {!isLoggedIn ? (
+            <div className="hidden sm:flex gap-2 py-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/${locale}/login`}>{i18n.login}</Link>
+              </Button>
+              <Button asChild size="sm" className="bg-[#013D5B] hover:bg-[#013D5B]/90">
+                <Link href={`/${locale}/signup`}>{i18n.signup}</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="hidden sm:flex items-center gap-2 py-2">
+              <span className="text-xs text-muted-foreground">Demo: logged in</span>
+              <Button variant="outline" size="sm" onClick={() => setIsLoggedIn(false)}>
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Card */}
       <div className="rounded-2xl border bg-background shadow-sm">
         {step === 0 && (
           <div className="p-4 sm:p-6 md:p-8 space-y-8">
-            <h1 className="text-2xl font-semibold">{i18n.title}</h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold">{i18n.title}</h1>
+              {/* Mobile quick auth buttons */}
+              {!isLoggedIn && (
+                <div className="flex sm:hidden gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/${locale}/login`}>{i18n.login}</Link>
+                  </Button>
+                  <Button asChild size="sm" className="bg-[#013D5B] hover:bg-[#013D5B]/90">
+                    <Link href={`/${locale}/signup`}>{i18n.signup}</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
 
             {/* Gender */}
             <div className="space-y-3">
@@ -279,10 +294,35 @@ export default function BookSession({ locale = "ar" as Locale }) {
                 <span className="text-xs text-muted-foreground">{i18n.howFeelHint}</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {i18n.chips.map((c) => (
+                {t[locale].chips.map((c) => (
                   <Chip key={c} label={c} selected={tags.includes(c)} onClick={() => toggleTag(c)} />
                 ))}
               </div>
+            </div>
+
+            {/* Preferred date (new: Popover + Calendar) */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">{i18n.preferredDate}</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-fit">
+                    <CalendarDays className="size-4" />
+                    <span className="ms-2">
+                      {date
+                        ? date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")
+                        : i18n.pickDate}
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Note */}
@@ -290,6 +330,7 @@ export default function BookSession({ locale = "ar" as Locale }) {
               <label className="text-sm font-medium">{i18n.describe}</label>
               <Textarea
                 rows={4}
+                maxLength={300}
                 placeholder={i18n.describePh}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -310,7 +351,6 @@ export default function BookSession({ locale = "ar" as Locale }) {
                 label={i18n.home}
                 selected={type === "home"}
                 onClick={() => setType("home")}
-                disabled={false /* toggle if Riyadh-only */}
               />
               <SelectCard
                 icon={<ShieldCheck className="size-5" />}
@@ -338,7 +378,20 @@ export default function BookSession({ locale = "ar" as Locale }) {
                 <Input placeholder={i18n.exp} inputMode="numeric" />
                 <Input placeholder={i18n.cvv} inputMode="numeric" />
               </div>
-              <Button className="mt-2 h-11 text-base" style={{ backgroundColor: BLUE }}>
+
+              {/* Terms checkbox */}
+              <div className="flex items-center gap-2 pt-2">
+                <Checkbox id="agree" checked={agree} onCheckedChange={(v) => setAgree(!!v)} />
+                <label htmlFor="agree" className="text-sm select-none cursor-pointer">
+                  {i18n.agree}
+                </label>
+              </div>
+
+              <Button
+                className="mt-2 h-11 text-base disabled:opacity-60"
+                style={{ backgroundColor: BLUE }}
+                disabled={!agree}
+              >
                 <CreditCard className="size-4" />
                 <span>{i18n.payNow}</span>
               </Button>
@@ -357,27 +410,9 @@ export default function BookSession({ locale = "ar" as Locale }) {
             {i18n.back}
           </Button>
 
-          <div className="flex items-center gap-2">
-            {/* ⬇️ Optional inline login entry (opens modal) */}
-            {!isAuthenticated && (
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setAuthMode("login");
-                  setShowLoginModal(true);
-                }}
-              >
-                <LogIn className="size-4" />
-                <span>{i18n.login}</span>
-              </Button>
-            )}
-
+          <div className="flex gap-2">
             {step < 2 ? (
-              <Button
-                onClick={() => canNext && goNext()}
-                className="h-10"
-                style={{ backgroundColor: BLUE }}
-              >
+              <Button onClick={handleNext} className="h-10" style={{ backgroundColor: BLUE }}>
                 {i18n.next}
                 {isRTL ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
               </Button>
@@ -386,122 +421,32 @@ export default function BookSession({ locale = "ar" as Locale }) {
         </div>
       </div>
 
-      {/* ⬇️ Auth modal with custom inline forms */}
-      <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {authMode === "login" ? i18n.mustLoginTitle : i18n.signup}
-            </DialogTitle>
-            <DialogDescription>
-              {authMode === "login" ? i18n.mustLoginDesc : ""}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={handleAuthSubmit} className="space-y-4">
-            {authMode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="fullname" className="text-sm font-medium">
-                  {i18n.nameLabel}
-                </Label>
-                <Input
-                  id="fullname"
-                  name="fullname"
-                  type="text"
-                  placeholder={i18n.namePlaceholder}
-                  required
-                />
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
-                {i18n.emailLabel}
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder={i18n.emailPlaceholder}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
-                {i18n.passwordLabel}
-              </Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-              />
-            </div>
-
-            {authMode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                  {i18n.confirmPasswordLabel}
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                />
-              </div>
-            )}
-
-            <Button 
-              type="submit" 
-              className="w-full" 
-              style={{ backgroundColor: BLUE }}
-            >
-              {authMode === "login" ? i18n.signIn : i18n.signUp}
+      {/* Login gate modal */}
+      <AlertDialog open={showLoginGate} onOpenChange={setShowLoginGate}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{i18n.mustLoginTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{i18n.mustLoginText}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
+            <AlertDialogCancel asChild>
+              <Button variant="outline">{/* closes modal */}OK</Button>
+            </AlertDialogCancel>
+            <Button asChild variant="outline">
+              <Link href={`/${locale}/login`}>{i18n.login}</Link>
             </Button>
-          </form>
-
-          {/* Social login options */}
-          <div className="space-y-4">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  {i18n.orContinue}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" type="button">
-                {i18n.google}
-              </Button>
-              <Button variant="outline" type="button">
-                {i18n.microsoft}
-              </Button>
-            </div>
-          </div>
-
-          <DialogFooter className="flex items-center justify-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => setAuthMode(authMode === "login" ? "signup" : "login")}
-              className="text-sm"
-            >
-              {authMode === "login" ? i18n.switchToSignup : i18n.switchToLogin}
+            <Button asChild className="bg-[#013D5B] hover:bg-[#013D5B]/90">
+              <Link href={`/${locale}/signup`}>{i18n.signup}</Link>
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
-  Small presentational components
+  Small presentational components (kept from your version)
 ──────────────────────────────────────────────────────────────────────────── */
 
 function Stepper({
@@ -510,7 +455,7 @@ function Stepper({
   rtl,
 }: {
   current: number;
-  labels: readonly string[]; // keep readonly to avoid TS error
+  labels: readonly string[];
   rtl?: boolean;
 }) {
   return (
@@ -541,7 +486,9 @@ function Stepper({
             ) : (
               <span className="inline-block size-2 rounded-full border" />
             )}
-            <span className={cn(active ? "font-semibold" : "text-muted-foreground")}>{label}</span>
+            <span className={cn(active ? "font-semibold" : "text-muted-foreground")}>
+              {label}
+            </span>
           </li>
         );
       })}
