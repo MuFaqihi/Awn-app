@@ -11,7 +11,7 @@ const members = [
     slug: "ahmed-alotaibi",
     name: { ar: "أحمد العتيبي", en: "Ahmed Al-Otaibi" },
     role: { ar: "أخصائي علاج طبيعي للأطفال", en: "Pediatric Physical Therapist" },
-    avatar: "/images/therapists/Ahmed.png",
+    avatar: "/Ahmed.png",
     bio: {
       ar: "يؤمن بأن اللعب والتفاعل الإيجابي أساس نجاح جلسات الأطفال.",
       en: "Believes play and positive interaction are key to children’s progress.",
@@ -25,7 +25,7 @@ const members = [
     slug: "sarah-alshahri",
     name: { ar: "سارة الشهري", en: "Sarah Al-Shahri" },
     role: { ar: "أخصائية علاج طبيعي للنساء", en: "Women’s Physical Therapist" },
-    avatar: "\images\therapists\Sarah.png",
+    avatar: "\Sarah.png",
     bio: {
       ar: "تركّز على صحة المرأة بشكل متكامل وتساعد في استعادة التوازن بعد الحمل والولادة.",
       en: "Focuses on holistic women’s health and recovery after childbirth.",
@@ -39,7 +39,7 @@ const members = [
     slug: "mohammed-alghamdi",
     name: { ar: "محمد الغامدي", en: "Mohammed Al-Ghamdi" },
     role: { ar: "أخصائي تأهيل الإصابات الرياضية", en: "Sports Rehabilitation Specialist" },
-    avatar: "\images\therapists\Mohammed.png",
+    avatar: "\Mohammed.png",
     bio: {
       ar: "يساعد الرياضيين على استعادة لياقتهم بسرعة وأمان باستخدام أحدث طرق العلاج.",
       en: "Helps athletes recover safely and efficiently with modern techniques.",
@@ -53,7 +53,7 @@ const members = [
     slug: "huda-alqahtani",
     name: { ar: "هدى القحطاني", en: "Huda Al-Qahtani" },
     role: { ar: "أخصائية علاج طبيعي عصبي", en: "Neurological Physical Therapist" },
-    avatar: "\images\therapists\Huda.png",
+    avatar: "\Huda.png",
     bio: {
       ar: "تساعد المرضى على استعادة قدراتهم الحركية بعد الجلطات والإصابات العصبية.",
       en: "Supports patients in regaining mobility after strokes and neurological injuries.",
@@ -67,7 +67,7 @@ const members = [
     slug: "faisal-alharbi",
     name: { ar: "فيصل الحربي", en: "Faisal Al-Harbi" },
     role: { ar: "أخصائي علاج طبيعي عظام", en: "Orthopedic Physical Therapist" },
-    avatar: "\images\therapists\Faisal.png",
+    avatar: "\Faisal.png",
     bio: {
       ar: "متخصص في علاج مشاكل العظام والعمود الفقري باستخدام أحدث الأساليب.",
       en: "Specializes in treating bones and spine with advanced therapeutic methods.",
@@ -81,7 +81,7 @@ const members = [
     slug: "amani-aldosari",
     name: { ar: "أماني الدوسري", en: "Amani Al-Dosari" },
     role: { ar: "أخصائية علاج طبيعي للمسنين", en: "Geriatric Physical Therapist" },
-    avatar: "\images\therapists\Amani.png",
+    avatar: "\Amani.png",
     bio: {
       ar: "تعمل على تحسين جودة حياة كبار السن من خلال خطط علاجية تناسب أعمارهم.",
       en: "Improves elderly quality of life through tailored therapeutic plans.",

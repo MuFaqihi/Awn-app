@@ -21,43 +21,43 @@ export default function TeamSection({
       slug: "ahmed-alotaibi",
       name: { ar: "أحمد العتيبي", en: "Ahmed Al-Otaibi" },
       role: { ar: "أخصائي علاج طبيعي للأطفال", en: "Pediatric Physical Therapist" },
-      avatar: "\images\therapists\Ahmed.png",
+      avatar: "/Ahmed.png",
       gender: "male",
       specialty: "children",
       session: "online",
     },
     {
       slug: "sarah-alshahri",
-      name: { ar: " سارة الشهري", en: "Sarah Al-Shahri" },
-      role: { ar: "أخصائية علاج طبيعي للنساء", en: "Women’s Physical Therapist" },
-      avatar: "\images\therapists\Sarah.png",
+      name: { ar: "سارة الشهري", en: "Sarah Al-Shahri" },
+      role: { ar: "أخصائية علاج طبيعي للنساء", en: "Women's Physical Therapist" },
+      avatar: "/Sarah.png", 
       gender: "female",
       specialty: "women",
       session: "home",
     },
     {
       slug: "mohammed-alghamdi",
-      name: { ar: " محمد الغامدي", en: "Mohammed Al-Ghamdi" },
+      name: { ar: "محمد الغامدي", en: "Mohammed Al-Ghamdi" },
       role: { ar: "أخصائي تأهيل الإصابات الرياضية", en: "Sports Rehabilitation Specialist" },
-      avatar: "\images\therapists\Mohammed.png",
+      avatar: "/Mohammed.png",
       gender: "male",
       specialty: "sports",
       session: "home",
     },
     {
       slug: "huda-alqahtani",
-      name: { ar: "هدى القحطاني", en: " Huda Al-Qahtani" },
+      name: { ar: "هدى القحطاني", en: "Huda Al-Qahtani" },
       role: { ar: "أخصائية علاج طبيعي عصبي", en: "Neurological Physical Therapist" },
-      avatar: "\images\therapists\Huda.png",
+      avatar: "/Huda.png", 
       gender: "female",
       specialty: "neuro",
       session: "online",
     },
     {
       slug: "faisal-alharbi",
-      name: { ar: " فيصل الحربي", en: "Faisal Al-Harbi" },
+      name: { ar: "فيصل الحربي", en: "Faisal Al-Harbi" },
       role: { ar: "أخصائي علاج طبيعي عظام", en: "Orthopedic Physical Therapist" },
-      avatar: "\images\therapists\Faisal.png",
+      avatar: "/Faisal.png", 
       gender: "male",
       specialty: "bones",
       session: "home",
@@ -66,7 +66,7 @@ export default function TeamSection({
       slug: "amani-aldosari",
       name: { ar: "أماني الدوسري", en: "Amani Al-Dosari" },
       role: { ar: "أخصائية علاج طبيعي للمسنين", en: "Geriatric Physical Therapist" },
-      avatar: "/images/therapists/Amani.png",
+      avatar: "/Amani.png", 
       gender: "female",
       specialty: "geriatrics",
       session: "online",
@@ -99,15 +99,19 @@ export default function TeamSection({
         {filteredMembers.length > 0 ? (
           filteredMembers.map((member) => (
             <div key={member.slug} className="border rounded-lg p-4 shadow">
+              {/* ✅ Improved image with error handling */}
               <img
                 src={member.avatar}
                 alt={member.name[locale]}
                 className="h-48 w-full object-cover rounded-md"
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  e.currentTarget.src = '/images/placeholder-avatar.png';
+                }}
               />
               <h3 className="mt-2 font-medium">{member.name[locale]}</h3>
               <p className="text-sm text-gray-600">{member.role[locale]}</p>
 
-              {/* زر التفاصيل يفتح صفحة الأخصائي */}
               <Link
                 href={`/${locale}/therapists/${member.slug}`}
                 className="mt-3 inline-block text-emerald-600 hover:underline"
@@ -124,4 +128,4 @@ export default function TeamSection({
       </div>
     </section>
   );
-}
+} 
