@@ -4,8 +4,8 @@ import { Cairo } from "next/font/google";
 import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import "../globals.css";
-import Header from "@/components/header";
-import FooterSection from "@/components/footer";
+import Header from "@/components/header";          // client component
+import FooterSection from "@/components/footer";   // <-- import the named default correctly
 import { ThemeProvider } from "@/components/theme-provider";
 
 const cairo = Cairo({
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   description: "Physical Therapy Platform",
 };
 
+// Type helper so TS knows the dict shape coming from getDictionary (still useful elsewhere)
 type Dict = Awaited<ReturnType<typeof getDictionary>>;
 
 export default async function RootLayout({
@@ -31,12 +32,8 @@ export default async function RootLayout({
   const lang = params.locale;
   const dir = lang === "ar" ? "rtl" : "ltr";
 
+  // You can still fetch this for other pages/sections that need it
   const dict: Dict = await getDictionary(lang);
-
-  // ✅ نشيك بالـ pathname: إذا فيها signup نخفي الهيدر والفوتر
-  const isSignupPage =
-    typeof children?.toString === "function" &&
-    (children as any)?.props?.childPropSegment === "signup";
 
   return (
     <html
@@ -46,22 +43,13 @@ export default async function RootLayout({
       className={cairo.variable}
     >
       <body className="min-h-dvh flex flex-col bg-background text-foreground antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {!isSignupPage && <Header locale={lang} dict={dict} />}
-
-          <main
-            id="main"
-            className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8"
-          >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {/* ✅ Do NOT pass dict to Header (it doesn’t use it) */}
+          <Header locale={lang} />
+          <main id="main" className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             {children}
           </main>
-
-          {!isSignupPage && <FooterSection />}
+          <FooterSection locale={lang} />
         </ThemeProvider>
       </body>
     </html>

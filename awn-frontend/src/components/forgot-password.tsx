@@ -1,8 +1,8 @@
- 'use client';
+'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Logo} from '@/components/logo';
+import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,12 +41,18 @@ export default function ForgotPasswordPage({ locale = 'ar' as Locale }) {
   }
 
   return (
-    <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent" dir={isRTL ? 'rtl' : 'ltr'}>
-      <form onSubmit={onSubmit} className="m-auto h-fit w-full max-w-[28rem] sm:max-w-md md:max-w-lg overflow-hidden rounded-2xl border bg-card shadow-md">
+    <section
+      className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <form
+        onSubmit={onSubmit}
+        className="m-auto h-fit w-full max-w-[28rem] sm:max-w-md md:max-w-lg overflow-hidden rounded-2xl border bg-card shadow-md"
+      >
         <div className="bg-card -m-px rounded-2xl border p-8 sm:p-10">
           <div className="text-center">
             <Link href={`/${locale}`} aria-label="go home" className="mx-auto block w-fit">
-              <Logo/>
+              <Logo />
             </Link>
             <h1 className="mb-1 mt-4 text-2xl font-semibold">{t.title}</h1>
             <p className="text-sm text-muted-foreground">{t.subtitle}</p>
@@ -54,10 +60,16 @@ export default function ForgotPasswordPage({ locale = 'ar' as Locale }) {
 
           <div className="mt-6 space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="block text-sm">{t.email}</Label>
+              <Label htmlFor="email" className="block text-sm">
+                {t.email}
+              </Label>
               <Input type="email" id="email" name="email" required placeholder={t.placeholder} />
             </div>
-            <Button type="submit" className="w-full h-11">{t.send}</Button>
+
+            {/* Fixed: Added submit button */}
+            <Button type="submit" className="w-full h-11 bg-[#013D5B] hover:bg-[#013D5B]/90">
+              {t.send}
+            </Button>
           </div>
 
           <div className="mt-6 text-center">
@@ -70,7 +82,7 @@ export default function ForgotPasswordPage({ locale = 'ar' as Locale }) {
             {t.remember}{' '}
             <Link
               href={`/${locale}/login`}
-              className="font-medium text-[oklch(45%_0.08_240)] transition-colors hover:text-[oklch(55%_0.1_240)] active:opacity-80"
+              className="font-medium text-blue-600 transition-colors hover:text-blue-700 active:opacity-80"
             >
               {t.login}
             </Link>
