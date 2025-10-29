@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -57,7 +57,11 @@ export default function ForgotPasswordPage({ locale = 'ar' as Locale }) {
               <Label htmlFor="email" className="block text-sm">{t.email}</Label>
               <Input type="email" id="email" name="email" required placeholder={t.placeholder} />
             </div>
-            <Button type="submit" className="w-full h-11">{t.send}</Button>
+            
+            {/* Fixed: Added submit button */}
+            <Button type="submit" className="w-full h-11 bg-[#013D5B] hover:bg-[#013D5B]/90">
+              {t.send}
+            </Button>
           </div>
 
           <div className="mt-6 text-center">
@@ -70,7 +74,7 @@ export default function ForgotPasswordPage({ locale = 'ar' as Locale }) {
             {t.remember}{' '}
             <Link
               href={`/${locale}/login`}
-              className="font-medium text-[oklch(45%_0.08_240)] transition-colors hover:text-[oklch(55%_0.1_240)] active:opacity-80"
+              className="font-medium text-blue-600 transition-colors hover:text-blue-700 active:opacity-80"
             >
               {t.login}
             </Link>

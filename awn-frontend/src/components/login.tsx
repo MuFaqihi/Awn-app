@@ -44,13 +44,13 @@ const EN: Dict = {
 export default function LoginPage({
   locale = 'ar',
   dict,
-  inline = false, // Add this prop
-  onSuccess, // Add this prop too
+  inline = false,
+  onSuccess,
 }: { 
   locale?: Locale; 
   dict?: Partial<Dict>;
-  inline?: boolean; // Add this type
-  onSuccess?: () => void; // Add this type
+  inline?: boolean;
+  onSuccess?: () => void;
 }) {
   const t: Dict = { ...(locale === 'ar' ? AR : EN), ...(dict || {}) };
   const isRTL = locale === 'ar';
@@ -61,8 +61,6 @@ export default function LoginPage({
   const [step, setStep] = React.useState<'form' | 'otp'>('form');
   const [otp, setOtp] = React.useState('');
   const [resendIn, setResendIn] = React.useState(0);
-  const canVerify = /^\d{6}$/.test(otp);
-
 
   React.useEffect(() => {
     if (step !== 'otp') return;
@@ -71,20 +69,19 @@ export default function LoginPage({
     return () => clearInterval(id);
   }, [step]);
 
-function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  if (inline) { onSuccess?.(); return; }
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (inline) { onSuccess?.(); return; }
 
-  const form = e.currentTarget as HTMLFormElement;
-  const phoneInput = form.querySelector<HTMLInputElement>('#phone'); // adjust id if different
-  const phone = phoneInput?.value || '';
-  router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
-}
+    const form = e.currentTarget as HTMLFormElement;
+    const phoneInput = form.querySelector<HTMLInputElement>('#phone');
+    const phone = phoneInput?.value || '';
+    router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
+  }
 
-function handleOtpComplete(v: string) {
-  // TODO: verify OTP server-side if needed
-  router.push(next);
-}
+  function handleOtpComplete(v: string) {
+    router.push(next);
+  }
 
   return (
     <section dir={isRTL ? 'rtl' : 'ltr'} className="flex min-h-screen bg-zinc-50 dark:bg-transparent px-4 py-16 md:py-24">
@@ -119,7 +116,7 @@ function handleOtpComplete(v: string) {
                 <div className="mt-1 flex">
                   <Link
                     href={`/${locale}/forgot-password`}
-                    className="ms-auto text-xs text-muted-foreground transition-colors hover:text-foreground active:opacity-80"
+                    className="ms-auto text-xs text-muted-foreground transition-colors hover:text-blue-600 active:text-blue-700"
                   >
                     {t.forgot}
                   </Link>
@@ -170,13 +167,13 @@ function handleOtpComplete(v: string) {
           )}
         </div>
 
-        {/* Footer link kept for familiarity */}
+        {/* Footer link */}
         <div className="p-5">
           <p className="text-center text-sm text-accent-foreground">
             {t.noAccount}{' '}
             <Link
               href={`/${locale}/signup?next=${encodeURIComponent(next)}`}
-              className="font-medium text-[oklch(45%_0.08_240)] transition-colors hover:text-[oklch(55%_0.1_240)] active:opacity-80"
+              className="font-medium text-blue-600 transition-colors hover:text-blue-700 active:opacity-80"
             >
               {t.create}
             </Link>

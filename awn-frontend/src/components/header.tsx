@@ -65,13 +65,14 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
   return (
     <header dir={isRTL ? 'rtl' : 'ltr'}>
       <nav
-        className={cx(
-          'fixed inset-x-0 top-0 z-50 border-b backdrop-blur-md',
-          'bg-primary/65 border-primary/25 dark:bg-primary/70 dark:border-primary/30'
-        )}
-      >
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center justify-between py-3 md:py-4">
+className={cx(
+    "fixed inset-x-0 top-0 z-50 h-16",              // <-- fixed height (64px)
+    "border-b backdrop-blur-md",
+    "bg-primary/65 border-primary/25 dark:bg-primary/70 dark:border-primary/30"
+  )}
+>
+  <div className="mx-auto max-w-7xl h-full px-6">    {/* h-full so children can center vertically */}
+    <div className="flex h-full items-center justify-between">
             {/* right: logo + pages */}
             <div className="flex items-center gap-6">
   {/* ✅ Only the header wraps in Link */}
@@ -241,7 +242,7 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
       </nav>
 
       {/* spacer below fixed nav */}
-      <div className="h-16 md:h-[4.5rem]" />
+      <div className="h-14 md:h-[4.5rem]" />
     </header>
   );
 }

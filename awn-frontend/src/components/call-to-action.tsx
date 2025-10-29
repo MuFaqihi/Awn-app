@@ -84,6 +84,8 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
        
        
         </div>
+
+        
       </div>
     </section>
   );

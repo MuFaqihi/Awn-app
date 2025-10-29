@@ -1,144 +1,186 @@
-// src/components/faqs.tsx
 'use client';
+
+import React, { useState } from 'react';
+import { ChevronDown, Search, MessageCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 type Locale = 'ar' | 'en';
 
 const AR = {
-  title1: 'الأسئلة',
-  title2: 'الشائعة',
-  blurb: 'إجابات سريعة حول الحجز، التحقق، الخصوصية، والدفع.',
+  title: 'الأسئلة الشائعة',
+  subtitle: 'إجابات سريعة حول منصة عون للعلاج الطبيعي',
+  searchPlaceholder: 'ابحث في الأسئلة...',
+  noResults: 'لا توجد نتائج',
+  contactNote: 'لم تجد إجابة سؤالك؟ تواصل معنا عبر support@awn.sa',
   items: [
     {
-      q: 'كيف أحجز جلسة علاج طبيعي؟',
-      a: 'ابحث عن الأخصائي حسب المدينة/التخصص/الجنس، اختر موعدًا متاحًا، ثم أكد الحجز. ستصلك رسالة تأكيد وتذكير قبل الموعد.',
-      bullets: [
-        'يمكنك تعديل/إلغاء الحجز حتى 12 ساعة قبل الموعد.',
-        'سياسة الإلغاء المتأخر قد تفرض رسومًا رمزية.'
-      ],
+      q: 'كيف أحجز موعد مع أخصائي علاج طبيعي؟',
+      a: 'سجل دخولك، ابحث عن الأخصائي المناسب حسب المدينة والتخصص، اختر الموعد المتاح، ثم أكد الحجز.',
     },
     {
-      q: 'هل تحتاجون إلى التحقق عبر أبشر/الهوية الوطنية؟',
-      a: 'نعم، نطلب التحقق مرة واحدة لزيادة الموثوقية وحماية جميع الأطراف. يتم عبر بوابة موثوقة ولا نحتفظ ببيانات حساسة.',
+      q: 'ما هي أنواع العلاج الطبيعي المتوفرة؟',
+      a: 'نوفر تخصصات متعددة: العلاج الطبيعي العام، إصابات الرياضة، العلاج العصبي، صحة المرأة، وعلاج الأطفال.',
     },
     {
-      q: 'هل الجلسات عن بُعد أم حضوري؟',
-      a: 'حالياً نوفّر جلسات حضورية في العيادات أو الزيارات المنزلية حسب تفضيل الأخصائي والمريض.',
-      bullets: [
-        'بعض الأخصائيين يقدّمون تقييمًا أوليًا بالفيديو.',
-      ],
+      q: 'هل الجلسات في العيادة أم زيارات منزلية؟',
+      a: 'نوفر كلا الخيارين حسب تفضيلك وتوفر الأخصائي. الزيارات المنزلية متاحة في الرياض وجدة والدمام.',
     },
     {
-      q: 'كيف يتم التسعير والدفع؟',
-      a: 'التسعير يحدّده الأخصائي. الدفع سيكون إلكترونيًا (لاحقًا) أو مباشرة لدى الأخصائي وفق المتاح.',
-      bullets: [
-        'سيتم دعم الدفع الإلكتروني والمحافظ المحلية قريبًا.',
-      ],
+      q: 'كيف يتم الدفع وما هي التكاليف؟',
+      a: 'كل أخصائي يحدد أسعاره. نقبل الدفع النقدي، البطاقات البنكية، والمحافظ الإلكترونية. بعض الأخصائيين يقبلون التأمين.',
     },
     {
-      q: 'ماذا عن سرية المعلومات والسجل الطبي؟',
-      a: 'نطبّق ممارسات أمان قوية. لا يرى الأخصائي سجلك إلا بعد موافقتك، ولغرض الرعاية فقط.',
+      q: 'هل معلوماتي الطبية آمنة ومحمية؟',
+      a: 'نلتزم بأعلى معايير الأمان وحماية البيانات. معلوماتك الطبية مشفرة ولا يمكن للأخصائي الوصول إليها إلا بموافقتك.',
     },
     {
-      q: 'كيف يتم التحقق من الأخصائيين؟',
-      a: 'نراجع الرخص المهنية والشهادات قبل تفعيل الحساب، مع تقييمات من المرضى بعد الجلسات لزيادة الشفافية.',
+      q: 'كيف أتأكد من خبرة وكفاءة الأخصائي؟',
+      a: 'جميع أخصائيينا مرخصون من الهيئة السعودية للتخصصات الصحية. يمكنك مراجعة خبراتهم وتقييمات المرضى السابقين.',
     },
     {
-      q: 'ما المناطق واللغات المتاحة؟',
-      a: 'نبدأ بمدن رئيسية داخل السعودية مع دعم العربية والإنجليزية، ونتوسع تدريجيًا.',
+      q: 'ماذا لو احتجت لإلغاء أو تأجيل الموعد؟',
+      a: 'يمكنك إلغاء أو تأجيل الموعد مجاناً حتى 24 ساعة قبل الجلسة عبر التطبيق أو الموقع.',
     },
     {
-      q: 'هل تقدمون دعمًا للطوارئ؟',
-      a: 'لا، عون ليست لخدمات الطوارئ. في حالات الطوارئ اتصل بـ 997 أو أقرب مستشفى فورًا.',
+      q: 'هل تقدمون خدمات طوارئ العلاج الطبيعي؟',
+      a: 'عون منصة للمواعيد المجدولة وليست لخدمات الطوارئ. يمكنك حجز مواعيد عاجلة (نفس اليوم) مع بعض الأخصائيين.',
     },
   ],
-  note: 'لم تجد إجابتك؟ تواصل معنا عبر صفحة الدعم.',
 };
 
 const EN = {
-  title1: 'Frequently',
-  title2: 'Asked Questions',
-  blurb: 'Quick answers about booking, verification, privacy, and payments.',
+  title: 'Frequently Asked Questions',
+  subtitle: 'Quick answers about Awn physiotherapy platform',
+  searchPlaceholder: 'Search questions...',
+  noResults: 'No results found',
+  contactNote: 'Didn\'t find your answer? Contact us at support@awn.sa',
   items: [
     {
-      q: 'How do I book a physiotherapy session?',
-      a: 'Search by city/specialty/gender, pick an available slot, then confirm. You’ll get a confirmation and a reminder.',
-      bullets: [
-        'You can reschedule/cancel up to 12 hours before the session.',
-        'Late cancellations may incur a small fee.',
-      ],
+      q: 'How do I book an appointment with a physiotherapist?',
+      a: 'Sign in, search for the right therapist by city and specialty, choose an available time slot, then confirm your booking.',
     },
     {
-      q: 'Do you require Absher/National ID verification?',
-      a: 'Yes, one-time verification improves trust and safety. It’s processed via a trusted gateway and we do not store sensitive data.',
+      q: 'What types of physiotherapy are available?',
+      a: 'We offer multiple specialties: general physiotherapy, sports injuries, neurological therapy, women\'s health, and pediatric therapy.',
     },
     {
-      q: 'Are sessions in-person or remote?',
-      a: 'Currently in-person at clinics or home visits, depending on the therapist and patient preference.',
-      bullets: ['Some therapists offer an initial video assessment.'],
+      q: 'Are sessions in-clinic or home visits?',
+      a: 'We offer both options based on your preference and therapist availability. Home visits are available in Riyadh, Jeddah, and Dammam.',
     },
     {
-      q: 'How is pricing and payment handled?',
-      a: 'Therapists set their own rates. Payments will be electronic (soon) or handled directly with the therapist when available.',
-      bullets: ['Local e-payments and wallets are coming soon.'],
+      q: 'How does payment work and what are the costs?',
+      a: 'Each therapist sets their own rates. We accept cash, bank cards, and digital wallets. Some therapists accept insurance.',
     },
     {
-      q: 'What about privacy and medical records?',
-      a: 'We follow strong security practices. A therapist can only access your record with your consent and for care purposes.',
+      q: 'Is my medical information safe and protected?',
+      a: 'We maintain the highest security and data protection standards. Your medical information is encrypted and accessible only with your consent.',
     },
     {
-      q: 'How are therapists verified?',
-      a: 'We verify professional licenses and credentials before activation. Post-session patient reviews add transparency.',
+      q: 'How can I verify a therapist\'s experience and qualifications?',
+      a: 'All our therapists are licensed by the Saudi Commission for Health Specialties. You can review their experience and patient ratings.',
     },
     {
-      q: 'Which regions and languages are supported?',
-      a: 'We start with major cities in Saudi Arabia, supporting Arabic and English, and will expand gradually.',
+      q: 'What if I need to cancel or reschedule my appointment?',
+      a: 'You can cancel or reschedule for free up to 24 hours before the session through the app or website.',
     },
     {
-      q: 'Do you handle emergencies?',
-      a: 'No—Awn is not for emergencies. For urgent care call 997 or go to the nearest ER.',
+      q: 'Do you provide emergency physiotherapy services?',
+      a: 'Awn is a platform for scheduled appointments. You can book urgent (same-day) appointments with some therapists.',
     },
   ],
-  note: 'Didn’t find your answer? Reach out via the Support page.',
 };
 
 export default function FAQs({ locale = 'ar' }: { locale?: Locale }) {
   const t = locale === 'ar' ? AR : EN;
-  const dir = locale === 'ar' ? 'rtl' : 'ltr';
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+
+  const filteredItems = t.items.filter(item => 
+    item.q.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.a.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const toggleItem = (index: number) => {
+    const newOpenItems = new Set(openItems);
+    if (newOpenItems.has(index)) {
+      newOpenItems.delete(index);
+    } else {
+      newOpenItems.add(index);
+    }
+    setOpenItems(newOpenItems);
+  };
 
   return (
-    <section className="scroll-py-16 py-16 md:scroll-py-32 md:py-32" dir={dir}>
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="grid gap-y-12 px-2 lg:[grid-template-columns:1fr_auto]">
-          <div className={locale === 'ar' ? 'text-center lg:text-right' : 'text-center lg:text-left'}>
-            <h2 className="mb-4 text-3xl font-semibold md:text-4xl">
-              {t.title1} <br className="hidden lg:block" /> {t.title2}
-            </h2>
-            <p className="text-muted-foreground">{t.blurb}</p>
-          </div>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.title}</h1>
+        <p className="text-gray-600">{t.subtitle}</p>
+      </div>
 
-          <div className="divide-y divide-dashed sm:mx-auto sm:max-w-lg lg:mx-0">
-            {t.items.map((item, idx) => (
-              <div key={idx} className={idx === 0 ? 'pb-6' : 'py-6'}>
-                <h3 className="font-medium">{item.q}</h3>
-                <p className="text-muted-foreground mt-4">{item.a}</p>
-                {item.bullets && (
-                  <ul className={`mt-4 space-y-2 pl-4 ${locale === 'ar' ? 'list-[arabic-indic]' : 'list-disc'}`}>
-                    {item.bullets.map((b, i) => (
-                      <li key={i} className="text-muted-foreground">
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className={`col-span-full text-center ${locale === 'ar' ? 'lg:text-right' : 'lg:text-left'}`}>
-            <p className="text-sm text-muted-foreground">{t.note}</p>
-          </div>
+      {/* Search */}
+      <div className="max-w-md mx-auto">
+        <div className="relative">
+          <Search className={`absolute top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 ${locale === 'ar' ? 'right-3' : 'left-3'}`} />
+          <Input
+            type="text"
+            placeholder={t.searchPlaceholder}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`${locale === 'ar' ? 'pr-10 text-right' : 'pl-10'}`}
+          />
         </div>
       </div>
-    </section>
+
+      {/* FAQ Items */}
+      <div className="max-w-3xl mx-auto space-y-4">
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">{t.noResults}</p>
+          </div>
+        ) : (
+          filteredItems.map((item, index) => (
+            <Card key={index} className="shadow-sm border-0 bg-white/80 backdrop-blur-sm">
+              <button
+                onClick={() => toggleItem(index)}
+                className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-gray-900 pr-4">{item.q}</h3>
+                  <ChevronDown 
+                    className={`h-5 w-5 text-gray-500 transition-transform ${
+                      openItems.has(index) ? 'rotate-180' : ''
+                    }`} 
+                  />
+                </div>
+              </button>
+              
+              {openItems.has(index) && (
+                <div className="px-6 pb-6">
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="text-gray-700 leading-relaxed">{item.a}</p>
+                  </div>
+                </div>
+              )}
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* Contact Note */}
+      <div className="text-center py-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <MessageCircle className="h-5 w-5 text-blue-600" />
+            <p className="text-gray-600">{t.contactNote}</p>
+          </div>
+          <Button variant="outline" className="hover:bg-blue-50">
+            {locale === 'ar' ? 'تواصل معنا' : 'Contact Us'}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

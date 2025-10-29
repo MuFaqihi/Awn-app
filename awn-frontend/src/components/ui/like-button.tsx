@@ -6,12 +6,26 @@ import { cn } from "@/lib/utils";
 export function LikeButton({
   children = "Like",
   className,
-}: { children?: React.ReactNode; className?: string }) {
-  const [liked, setLiked] = React.useState(false);
+  initialLiked = false,
+  onToggle,
+}: { 
+  children?: React.ReactNode; 
+  className?: string;
+  initialLiked?: boolean;
+  onToggle?: (liked: boolean) => void;
+}) {
+  const [liked, setLiked] = React.useState(initialLiked);
+  
+  const handleClick = () => {
+    const newLiked = !liked;
+    setLiked(newLiked);
+    onToggle?.(newLiked);
+  };
+
   return (
     <motion.button
       type="button"
-      onClick={() => setLiked((v) => !v)}
+      onClick={handleClick}
       whileTap={{ scale: 0.96 }}
       className={cn(
         "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm",

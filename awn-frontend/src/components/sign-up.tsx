@@ -46,30 +46,28 @@ export default function SignUpPage({ locale = 'ar' }: { locale?: Locale }) {
   const router = useRouter();
   const sp = useSearchParams();
   const next = sp.get('next') || `/${locale}/dashboard`;
-const [step, setStep] = React.useState<'form' | 'otp'>('form');
-const [otp, setOtp] = React.useState('');
-const [resendIn, setResendIn] = React.useState(0); // Add this line
-const canVerify = /^\d{6}$/.test(otp);
+  const [step, setStep] = React.useState<'form' | 'otp'>('form');
+  const [otp, setOtp] = React.useState('');
+  const [resendIn, setResendIn] = React.useState(0);
 
-React.useEffect(() => {
-  if (step !== 'otp') return;
-  setResendIn(30);
-  const id = setInterval(() => setResendIn(s => (s > 0 ? s - 1 : 0)), 1000);
-  return () => clearInterval(id);
-}, [step]);
+  React.useEffect(() => {
+    if (step !== 'otp') return;
+    setResendIn(30);
+    const id = setInterval(() => setResendIn(s => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [step]);
 
-function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-  const form = e.currentTarget as HTMLFormElement;
-  const phoneInput = form.querySelector<HTMLInputElement>('#phone');
-  const phone = phoneInput?.value || '';
+    const form = e.currentTarget as HTMLFormElement;
+    const phoneInput = form.querySelector<HTMLInputElement>('#phone');
+    const phone = phoneInput?.value || '';
 
-  const next = `/${locale}/dashboard`;
-  router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
-}
+    router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
+  }
+  
   function handleOtpComplete(code: string) {
-    // TODO: verify OTP
     router.push(next);
   }
 
@@ -111,18 +109,10 @@ function onSubmit(e: React.FormEvent<HTMLFormElement>) {
                 <Input id="password" name="password" type="password" required autoComplete="new-password" />
               </div>
 
-              {/* The actual SIGN UP button (inside the form) */}
-              <Button type="submit" className="w-full h-11 text-base">{t.signUp}</Button>
-
-              <p className="text-center text-sm text-accent-foreground">
-                {t.haveAccount}{' '}
-                <Link
-                  href={`/${locale}/login?next=${encodeURIComponent(next)}`}
-                  className="font-medium text-[oklch(45%_0.08_240)] transition-colors hover:text-[oklch(55%_0.1_240)] active:opacity-80"
-                >
-                  {t.signIn}
-                </Link>
-              </p>
+              {/* Fixed: Moved submit button inside form section */}
+              <Button type="submit" className="w-full h-11 text-base bg-[#013D5B] hover:bg-[#013D5B]/90">
+                {t.signUp}
+              </Button>
             </div>
           )}
 
@@ -151,9 +141,19 @@ function onSubmit(e: React.FormEvent<HTMLFormElement>) {
             </div>
           )}
         </div>
-        <Button type="submit" className="w-full h-11">
-  {t.signUp}
-</Button>
+
+        {/* Footer link */}
+        <div className="p-5">
+          <p className="text-center text-sm text-accent-foreground">
+            {t.haveAccount}{' '}
+            <Link
+              href={`/${locale}/login?next=${encodeURIComponent(next)}`}
+              className="font-medium text-blue-600 transition-colors hover:text-blue-700 active:opacity-80"
+            >
+              {t.signIn}
+            </Link>
+          </p>
+        </div>
       </form>
     </section>
   );

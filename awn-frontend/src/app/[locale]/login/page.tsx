@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import Login from "@/components/login";
@@ -22,3 +23,11 @@ export default function LoginPage({
     </div>
   );
 }
+=======
+import LoginPage from '@/components/login';
+import type { Locale } from '@/lib/i18n';
+
+export default function Page({ params }: { params: { locale: Locale } }) {
+  return <LoginPage locale={params.locale} />;
+}
+>>>>>>> c28f163 (Initial commit: Awn physiotherapy platform frontend)
