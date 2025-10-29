@@ -3,11 +3,19 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+<<<<<<< HEAD
+=======
+import Link, { LinkProps } from "next/link";
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b
 
 interface Links {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
+<<<<<<< HEAD
+=======
+  onClick?: () => void;
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b
 }
 
 interface SidebarContextProps {
@@ -88,7 +96,11 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
+<<<<<<< HEAD
           "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0",
+=======
+          "min-h-screen px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0 sticky top-0",
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b
           className
         )}
         animate={{
@@ -114,7 +126,11 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
+<<<<<<< HEAD
           "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+=======
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b
         )}
         {...props}
       >
@@ -163,6 +179,7 @@ export const SidebarLink = ({
   className?: string;
 }) => {
   const { open, animate } = useSidebar();
+<<<<<<< HEAD
   return (
     <a
       href={link.href}
@@ -171,6 +188,24 @@ export const SidebarLink = ({
         className
       )}
       {...props}
+=======
+  
+  const handleClick = (e: React.MouseEvent) => {
+    if (link.onClick) {
+      e.preventDefault();
+      link.onClick();
+    }
+  };
+
+  return (
+    <Link
+      href={link.href}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2",
+        className
+      )}
+      onClick={handleClick}
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b
     >
       {link.icon}
 
@@ -183,6 +218,12 @@ export const SidebarLink = ({
       >
         {link.label}
       </motion.span>
+<<<<<<< HEAD
     </a>
   );
 };
+=======
+    </Link>
+  );
+};
+>>>>>>> 273240fd94f74c1760111980c006efe6aa3a824b

@@ -1,14 +1,14 @@
 // src/components/call-to-action.tsx
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   ShieldCheck,
   CalendarCheck2,
   Home,
   ChevronRight,
   ChevronLeft,
-} from 'lucide-react'
+} from 'lucide-react';
 
 type Locale = 'ar' | 'en';
 
@@ -45,8 +45,12 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
 
       <div className="mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-4xl font-semibold leading-tight md:text-5xl">{t.title}</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{t.subtitle}</p>
+          <h2 className="text-4xl font-semibold leading-tight md:text-5xl">
+            {t.title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+            {t.subtitle}
+          </p>
 
           {/* CTAs */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
