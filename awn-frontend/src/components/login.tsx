@@ -14,7 +14,7 @@ const BRAND = '#013D5B';
 type Locale = 'ar' | 'en';
 type Dict = {
   title: string; subtitle: string;
-  phoneLabel: string; phonePlaceholder: string;
+  emailLabel: string; emailPlaceholder: string;
   passwordLabel: string; forgot: string; signIn: string;
   noAccount: string; create: string;
   otpTitle: string; otpHelp: string; resend: string; back: string;
@@ -22,22 +22,23 @@ type Dict = {
 
 const AR: Dict = {
   title:'تسجيل الدخول إلى عون',
-  subtitle:'مرحبًا بعودتك! سجّل دخولك للمتابعة.',
-  phoneLabel:'رقم الجوال', phonePlaceholder:'55x xxx xxxx',
+  subtitle:'مرحبًا، سجّل دخولك للمتابعة.',
+  emailLabel:'البريد الإلكتروني', emailPlaceholder:'example@email.com',
   passwordLabel:'كلمة المرور', forgot:'نسيت كلمة المرور؟', signIn:'تسجيل الدخول',
   noAccount:'ليس لديك حساب؟', create:'إنشاء حساب',
   otpTitle:'أدخل رمز التحقق',
-  otpHelp:'أرسلنا رمزًا مكوّنًا من 6 أرقام إلى جوالك.',
+  otpHelp:'أرسلنا رمزًا مكوّنًا من 6 أرقام إلى بريدك الإلكتروني.',
   resend:'إعادة الإرسال', back:'رجوع',
 };
+
 const EN: Dict = {
   title:'Sign in to Awn',
-  subtitle:'Welcome back! Sign in to continue.',
-  phoneLabel:'Phone number', phonePlaceholder:'55x xxx xxxx',
+  subtitle:'Welcome! Sign in to continue.',
+  emailLabel:'Email address', emailPlaceholder:'example@email.com',
   passwordLabel:'Password', forgot:'Forgot your password?', signIn:'Sign in',
   noAccount:"Don't have an account?", create:'Create account',
   otpTitle:'Enter verification code',
-  otpHelp:'We sent a 6-digit code to your phone.',
+  otpHelp:'We sent a 6-digit code to your email.',
   resend:'Resend code', back:'Back',
 };
 
@@ -56,7 +57,26 @@ export default function LoginPage({
   const isRTL = locale === 'ar';
   const router = useRouter();
   const sp = useSearchParams();
-  const next = sp.get('next') || `/${locale}/dashboard`;
+
+  // ✅ نقرأ الدور من الرابط ?role=therapist
+  const role = sp.get('role') || 'patient';
+
+  // ✅ نوجّه بناءً على الدور
+  const next =
+    sp.get('next') ||
+    (role === 'therapist'
+      ? `/${locale}/therapist-dashboard`
+      : `/${locale}/dashboard`);
+
+  // ✅ نعدّل النصوص حسب الدور
+  if (role === 'therapist') {
+    t.title = locale === 'ar' ? 'تسجيل دخول المعالج' : 'Therapist Sign-in';
+    t.subtitle = locale === 'ar'
+      ? 'مرحبًا، سجّل دخولك للوصول إلى لوحة التحكم الخاصة بك.'
+      : 'Welcome! Sign in to your therapist dashboard.';
+    t.noAccount = locale === 'ar' ? 'لست مسجلاً كمعالج؟' : 'Not registered as a therapist?';
+    t.create = locale === 'ar' ? 'انضم كمعالج' : 'Join as therapist';
+  }
 
   const [step, setStep] = React.useState<'form' | 'otp'>('form');
   const [otp, setOtp] = React.useState('');
@@ -72,14 +92,11 @@ export default function LoginPage({
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (inline) { onSuccess?.(); return; }
-
-    const form = e.currentTarget as HTMLFormElement;
-    const phoneInput = form.querySelector<HTMLInputElement>('#phone');
-    const phone = phoneInput?.value || '';
-    router.push(`/${locale}/otp?next=${encodeURIComponent(next)}&phone=${encodeURIComponent(phone)}`);
+    setStep('otp'); // ← الانتقال لخطوة الـ OTP
   }
 
   function handleOtpComplete(v: string) {
+    localStorage.setItem("isLoggedIn", "true");
     router.push(next);
   }
 
@@ -100,16 +117,22 @@ export default function LoginPage({
 
           {step === 'form' && (
             <div className="mt-8 space-y-6">
-              {/* Phone */}
+              {/* ✅ Email field */}
               <div className="space-y-2">
-                <Label htmlFor="phone" className="block text-sm">{t.phoneLabel}</Label>
-                <div className="flex">
-                  <span className="inline-flex items-center justify-center rounded-s-md border bg-muted px-3 text-sm text-muted-foreground">+966</span>
-                  <Input id="phone" name="phone" type="tel" required className="rounded-s-none" placeholder={t.phonePlaceholder} autoComplete="username" inputMode="tel" />
-                </div>
+                <Label htmlFor="email" className="block text-sm">{t.emailLabel}</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="w-full"
+                  placeholder={t.emailPlaceholder}
+                  autoComplete="username"
+                  inputMode="email"
+                />
               </div>
 
-              {/* Password + Forgot under field */}
+              {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm">{t.passwordLabel}</Label>
                 <Input id="password" name="password" type="password" required autoComplete="current-password" />
@@ -123,7 +146,7 @@ export default function LoginPage({
                 </div>
               </div>
 
-              {/* Primary submit */}
+              {/* Submit */}
               <Button
                 type="submit"
                 className="w-full h-11 text-base font-medium transition-all hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]"
@@ -132,9 +155,17 @@ export default function LoginPage({
                 {t.signIn}
               </Button>
 
-              {/* Secondary: Create account (button) */}
+              {/* Create Account */}
               <Button asChild variant="outline" className="w-full h-11 text-base">
-                <Link href={`/${locale}/signup?next=${encodeURIComponent(next)}`}>{t.create}</Link>
+                <Link
+                  href={
+                    role === 'therapist'
+                      ? `/${locale}/therapists-signup?next=${encodeURIComponent(next)}`
+                      : `/${locale}/signup?next=${encodeURIComponent(next)}`
+                  }
+                >
+                  {t.create}
+                </Link>
               </Button>
             </div>
           )}
@@ -167,12 +198,16 @@ export default function LoginPage({
           )}
         </div>
 
-        {/* Footer link */}
+        {/* Footer */}
         <div className="p-5">
           <p className="text-center text-sm text-accent-foreground">
             {t.noAccount}{' '}
             <Link
-              href={`/${locale}/signup?next=${encodeURIComponent(next)}`}
+              href={
+                role === 'therapist'
+                  ? `/${locale}/therapists-signup?next=${encodeURIComponent(next)}`
+                  : `/${locale}/signup?next=${encodeURIComponent(next)}`
+              }
               className="font-medium text-blue-600 transition-colors hover:text-blue-700 active:opacity-80"
             >
               {t.create}

@@ -15,7 +15,8 @@ export function AnimatedOTPInput({
   maxLength?: number;
   className?: string;
 }) {
-  const refs = React.useRef<Array<HTMLInputElement | null>>([]);
+  // ✅ تعريف الـ refs بشكل صحيح
+  const refs = React.useRef<(HTMLInputElement | null)[]>([]);
 
   function setAt(i: number, ch: string) {
     const next = (value.slice(0, i) + ch + value.slice(i + 1)).slice(0, maxLength);
@@ -25,6 +26,13 @@ export function AnimatedOTPInput({
   }
 
   function onKey(i: number, e: React.KeyboardEvent<HTMLInputElement>) {
+    // ✅ منع الحروف
+    if (/^[A-Za-z]$/.test(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
+    // ✅ التعامل مع Backspace
     if (e.key === "Backspace") {
       e.preventDefault();
       const next = value.slice(0, i) + "_" + value.slice(i + 1);
@@ -32,12 +40,11 @@ export function AnimatedOTPInput({
       if (i > 0) refs.current[i - 1]?.focus();
     }
   }
-React.useEffect(() => {
-  // initialize only when the value is truly empty
-  if (value === '') onChange('_'.repeat(maxLength));
-  // DO NOT depend on `onChange` here; it causes a reset every render
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [maxLength, value]);
+
+  React.useEffect(() => {
+    if (value === "") onChange("_".repeat(maxLength));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxLength, value]);
 
   const chars = (value || "_".repeat(maxLength)).slice(0, maxLength).split("");
 
@@ -50,9 +57,14 @@ React.useEffect(() => {
             refs.current[i] = el;
           }}
           inputMode="numeric"
+          pattern="[0-9]*"
           maxLength={1}
           value={ch.replace("_", "")}
-          onChange={(e) => setAt(i, e.target.value.replace(/\D/g, "").slice(0, 1))}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (!/^\d?$/.test(val)) return; // ✅ يقبل رقم واحد فقط
+            setAt(i, val);
+          }}
           onKeyDown={(e) => onKey(i, e)}
           className={cn(
             "h-12 w-10 rounded-md border bg-background text-center text-lg",

@@ -16,7 +16,7 @@ export function Logo({
     <span className={cn('inline-block', className)} aria-label={alt}>
       {/* Light mode logo */}
       <Image
-        src="/brand:logo-light.png"
+        src="/brand-logo-light.png"
         alt={alt}
         width={size}
         height={Math.round(size * 0.28)}
@@ -25,7 +25,7 @@ export function Logo({
       />
       {/* Dark mode logo */}
       <Image
-        src="/brand:logo-dark.png"
+        src="/brand-logo-dark.png"
         alt={alt}
         width={size}
         height={Math.round(size * 0.28)}

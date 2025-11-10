@@ -1,4 +1,3 @@
-// src/app/[locale]/layout.tsx
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import type { Locale } from "@/lib/i18n";

@@ -1,10 +1,10 @@
 "use client";
 import * as React from "react";
 import type { Locale } from "@/lib/i18n";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { CalendarDays, LogOut, Heart, Settings, ClipboardList, User } from "lucide-react";
+import { CalendarDays, Heart, Settings, ClipboardList, User } from "lucide-react";
 import { IconBrandTabler, IconArrowLeft } from "@tabler/icons-react";
 import { motion } from "motion/react";
 
@@ -46,6 +46,13 @@ const LogoIcon = () => {
 export default function DashboardLayout({ children, locale }: DashboardLayoutProps) {
   const ar = locale === "ar";
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn");
+    if (!loggedIn) {
+      window.location.href = `/${locale}/login`;
+    }
+  }, [locale]);
 
   // Links exactly like the original
   const links = [
@@ -91,8 +98,10 @@ export default function DashboardLayout({ children, locale }: DashboardLayoutPro
         <IconArrowLeft className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
       onClick: () => {
-        alert(ar ? "تم تسجيل الخروج" : "Logged out");
-      }
+        localStorage.removeItem("isLoggedIn");
+
+        window.location.href = `/${locale}`;
+      },
     },
   ];
 
