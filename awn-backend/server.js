@@ -5,6 +5,14 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
+
+app.use(express.json());
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -222,7 +230,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`الباك إند يعمل على http://localhost:${PORT}`);
-  console.log(`نظام آمن - جاهز للطلبات!`);
-  console.log(`استخدم GET /api لرؤية جميع الـ endpoints`);
+  console.log(` الباك إند شغاااااااال تف تف اللهم لا حسد ${PORT}`);
 });
