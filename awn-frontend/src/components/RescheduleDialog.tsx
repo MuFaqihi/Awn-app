@@ -24,7 +24,7 @@ interface RescheduleDialogProps {
 export function RescheduleDialog({ appointment, locale, trigger, onReschedule }: RescheduleDialogProps) {
   const ar = locale === "ar";
   const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [mode, setMode] = useState<string>(appointment.kind);
   const [note, setNote] = useState<string>("");
@@ -38,6 +38,43 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
     "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
   ];
 
+  // Generate available dates including all of 2026 (Sunday to Thursday)
+  const generateAvailableDates = (): string[] => {
+    const dates: string[] = [];
+    const today = new Date();
+    
+    // Add remaining days from current month and year
+    for (let i = 1; i <= 60; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      
+      // Skip Fridays (5) and Saturdays (6)
+      if (date.getDay() !== 5 && date.getDay() !== 6) {
+        dates.push(date.toISOString().split('T')[0]);
+      }
+    }
+    
+    // Add all working days for 2026 (Sunday to Thursday)
+    for (let month = 0; month < 12; month++) {
+      const daysInMonth = new Date(2026, month + 1, 0).getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(2026, month, day);
+        const dayOfWeek = date.getDay();
+        
+        // Include Sunday (0), Monday (1), Tuesday (2), Wednesday (3), Thursday (4)
+        // Exclude Friday (5) and Saturday (6)
+        if (dayOfWeek >= 0 && dayOfWeek <= 4) {
+          dates.push(date.toISOString().split('T')[0]);
+        }
+      }
+    }
+    
+    return dates.sort();
+  };
+
+  const availableDates = generateAvailableDates();
+
   const formatCurrentDate = () => {
     const date = new Date(appointment.date);
     return date.toLocaleDateString(ar ? 'ar-SA' : 'en-US', {
@@ -50,7 +87,8 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
 
   const formatNewDate = () => {
     if (!selectedDate) return "";
-    return selectedDate.toLocaleDateString(ar ? 'ar-SA' : 'en-US', {
+    const date = new Date(selectedDate);
+    return date.toLocaleDateString(ar ? 'ar-SA' : 'en-US', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -65,19 +103,27 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
     return hoursDiff < 24;
   };
 
-  const canReschedule = !isWithinCutoff();
+  // Remove the cutoff restriction for now
+  const canReschedule = true; // Changed from !isWithinCutoff()
+
+  const handleDateSelect = (dateStr: string) => {
+    setSelectedDate(dateStr);
+    setSelectedTime(""); // Reset time when date changes
+  };
 
   const handleSubmit = async () => {
     if (!selectedDate || !selectedTime) return;
     
     setIsSubmitting(true);
     try {
-      await onReschedule(selectedDate, selectedTime, mode, note);
+      const newDate = new Date(selectedDate);
+      await onReschedule(newDate, selectedTime, mode, note);
       setOpen(false);
       // Reset form
-      setSelectedDate(undefined);
+      setSelectedDate("");
       setSelectedTime("");
       setNote("");
+      setMode(appointment.kind); // Reset to original mode
     } catch (error) {
       console.error("Failed to reschedule:", error);
     } finally {
@@ -85,7 +131,8 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
     }
   };
 
-  const isFormValid = selectedDate && selectedTime;
+  // Fix form validation - make sure all required fields are filled
+  const isFormValid = Boolean(selectedDate && selectedTime && mode);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -104,16 +151,16 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
           <Card className="p-4 bg-muted/30">
             <div className="flex items-center gap-3 mb-2">
               <img 
-                src={therapist?.avatar || "/avatar-placeholder.jpg"} 
+                src={therapist?.image || "/avatar-placeholder.jpg"} 
                 className="h-10 w-10 rounded-full object-cover" 
-                alt={therapist?.name || "Therapist"} 
+                alt={therapist?.name.en || "Therapist"} 
               />
               <div>
                 <div className="font-medium">
-                  {ar ? therapist?.nameAr : therapist?.name}
+                  {ar ? therapist?.name.ar : therapist?.name.en}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {ar ? therapist?.specialtyAr : therapist?.specialty}
+                  {ar ? therapist?.specialties[0] : therapist?.specialties[0]}
                 </div>
               </div>
             </div>
@@ -130,31 +177,11 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
               ) : (
                 <Badge variant="secondary" className="text-xs">
                   <MapPin className="h-3 w-3 mr-1" />
-                  {ar ? "في العيادة" : "In-clinic"}
+                  {ar ? "زيارة منزلية" : "Home visit"}
                 </Badge>
               )}
             </div>
           </Card>
-
-          {/* Policy Warning if within cutoff */}
-          {!canReschedule && (
-            <Card className="p-4 border-amber-200 bg-amber-50">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-                <div className="text-sm">
-                  <div className="font-medium text-amber-800">
-                    {ar ? "تغيير محدود" : "Limited Changes"}
-                  </div>
-                  <div className="text-amber-700">
-                    {ar 
-                      ? "التغييرات مسموحة قبل 24 ساعة من بداية الموعد. قد تطبق رسوم إضافية."
-                      : "Changes allowed ≥24h before start. Additional fees may apply."
-                    }
-                  </div>
-                </div>
-              </div>
-            </Card>
-          )}
 
           {/* Step A: Date & Time Selection */}
           <div className="space-y-4">
@@ -165,16 +192,17 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
             {/* Calendar */}
             <div className="flex justify-center">
               <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="rounded-md border"
-                disabled={(date) => {
-                  const today = new Date();
-                  const minDate = new Date(today);
-                  minDate.setDate(today.getDate() + 1); // Min 1 day lead time
-                  return date < minDate || date.getDay() === 5 || date.getDay() === 6; // Disable Fri/Sat
+                selected={selectedDate ? new Date(selectedDate) : undefined}
+                onSelect={(date) => {
+                  if (date) {
+                    handleDateSelect(date.toISOString().split('T')[0]);
+                  }
                 }}
+                disabled={(date) => {
+                  const dateStr = date.toISOString().split('T')[0];
+                  return !availableDates.includes(dateStr);
+                }}
+                initialFocus
               />
             </div>
 
@@ -217,20 +245,20 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
                   {ar ? "نوع الجلسة:" : "Session type:"}
                 </label>
                 <Select value={mode} onValueChange={setMode}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white border border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="online">
+                  <SelectContent className="bg-white border border-gray-300 shadow-lg">
+                    <SelectItem value="online" className="bg-white hover:bg-gray-50">
                       <div className="flex items-center gap-2">
                         <Video className="h-4 w-4" />
                         {ar ? "جلسة أونلاين" : "Online session"}
                       </div>
                     </SelectItem>
-                    <SelectItem value="clinic">
+                    <SelectItem value="home" className="bg-white hover:bg-gray-50">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
-                        {ar ? "في العيادة" : "In-clinic"}
+                        {ar ? "زيارة منزلية" : "Home visit"}
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -246,7 +274,7 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder={ar ? "مثل: أفضل المواعيد المسائية" : "e.g., Need afternoon please"}
-                  className="text-sm"
+                  className="text-sm bg-white"
                   rows={2}
                 />
               </div>
@@ -260,8 +288,8 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
                 {ar ? "ملخص الموعد الجديد:" : "New appointment summary:"}
               </h4>
               <div className="text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{ar ? therapist?.nameAr : therapist?.name}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium">{ar ? therapist?.name.ar : therapist?.name.en}</span>
                   <span>•</span>
                   <span>{formatNewDate()}</span>
                   <span>•</span>
@@ -275,7 +303,7 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
                   ) : (
                     <Badge variant="secondary" className="text-xs">
                       <MapPin className="h-3 w-3 mr-1" />
-                      {ar ? "في العيادة" : "In-clinic"}
+                      {ar ? "زيارة منزلية" : "Home visit"}
                     </Badge>
                   )}
                 </div>
@@ -283,9 +311,7 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
             </Card>
           )}
 
-       
-
-
+          
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-6 border-t mt-6">
@@ -298,8 +324,8 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
             </Button>
             <Button 
               onClick={handleSubmit}
-              disabled={!isFormValid || isSubmitting || !canReschedule}
-              className="flex-1 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              disabled={!isFormValid || isSubmitting}
+              className="flex-1 transition-all duration-200 hover:scale-105 active:scale-95 disabled:hover:scale-100 bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
@@ -311,9 +337,6 @@ export function RescheduleDialog({ appointment, locale, trigger, onReschedule }:
               )}
             </Button>
           </div>
-
-
-
         </div>
       </DialogContent>
     </Dialog>

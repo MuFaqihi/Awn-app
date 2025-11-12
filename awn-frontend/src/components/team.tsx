@@ -112,12 +112,12 @@ export default function TeamSection({
               <h3 className="mt-2 font-medium">{member.name[locale]}</h3>
               <p className="text-sm text-gray-600">{member.role[locale]}</p>
 
-              <Link
-                href={`/${locale}/therapists/${member.slug}`}
-                className="mt-3 inline-block text-emerald-600 hover:underline"
-              >
-                {isArabic ? "تفاصيل" : "Details"}
-              </Link>
+             <Link
+  href={`/${locale}/therapists/dr-sarah-ahmed`} // Use the actual ID from your data
+  className="mt-3 inline-block text-emerald-600 hover:underline"
+>
+  {isArabic ? "تفاصيل" : "Details"}
+</Link>
             </div>
           ))
         ) : (

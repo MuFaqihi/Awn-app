@@ -7,6 +7,7 @@ import "../globals.css";
 import Header from "@/components/header";          // client component
 import FooterSection from "@/components/footer";   // <-- import the named default correctly
 import { ThemeProvider } from "@/components/theme-provider";
+import { ToastProvider } from "@/components/ui/base-toast"
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -44,12 +45,13 @@ export default async function RootLayout({
     >
       <body className="min-h-dvh flex flex-col bg-background text-foreground antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {/* ✅ Do NOT pass dict to Header (it doesn’t use it) */}
-          <Header locale={lang} />
-          <main id="main" className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            {children}
-          </main>
-          <FooterSection locale={lang} />
+      <ToastProvider position="top-right" timeout={5000} showCloseButton={true}>
+  <Header locale={lang} />
+  <main id="main" className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    {children}
+  </main>
+  <FooterSection locale={lang} />
+</ToastProvider>
         </ThemeProvider>
       </body>
     </html>

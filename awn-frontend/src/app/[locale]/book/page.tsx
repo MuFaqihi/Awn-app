@@ -1,4 +1,4 @@
-// src/app/[locale]/book/page.tsx
+/*
 import type { Locale } from "@/lib/i18n";
 import BookSession from "@/components/booking/book-session"; // <-- direct import (client component)
 
@@ -12,4 +12,4 @@ export default function BookPage({
       <BookSession locale={params.locale} />
     </div>
   );
-}
+}*/

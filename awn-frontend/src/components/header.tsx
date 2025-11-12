@@ -2,9 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useTheme } from 'next-themes';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 
@@ -13,15 +12,15 @@ export type Locale = 'ar' | 'en';
 const NAV_AR = [
   { name: 'الرئيسية', path: '' },
   { name: 'المختصّين', path: 'therapists' },
-  { name: 'انضم كمختص', path: 'signup?role=therapist' },
+  { name: 'انضم كمختص', path: '/job-listing' },
   { name: 'تواصل', path: 'contact' },
-  { name: 'الأسئلة الشائعة', path: 'faq' }, // FAQ instead of Features
+  { name: 'الأسئلة الشائعة', path: 'faq' },
 ];
 
 const NAV_EN = [
   { name: 'Home', path: '' },
   { name: 'Therapists', path: 'therapists' },
-  { name: 'Join as Therapist', path: 'signup?role=therapist' },
+  { name: 'Join as Therapist', path: '/job-listing' },
   { name: 'Contact', path: 'contact' },
   { name: 'FAQ', path: 'faq' },
 ];
@@ -47,35 +46,59 @@ function isActive(pathname: string, locale: Locale, itemPath: string) {
   return current === target;
 }
 
+// Check if user is logged in based on current path
+function isLoggedIn(pathname: string) {
+  return pathname.includes('/dashboard') || pathname.includes('/therapist-dashboard');
+}
+
+// Get user type from pathname
+function getUserType(pathname: string): 'client' | 'therapist' | null {
+  if (pathname.includes('/therapist-dashboard')) return 'therapist';
+  if (pathname.includes('/dashboard')) return 'client';
+  return null;
+}
+
 export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
   const pathname = usePathname() || `/${locale}`;
+  const router = useRouter();
   const isRTL = locale === 'ar';
   const nav = isRTL ? NAV_AR : NAV_EN;
   const [open, setOpen] = React.useState(false);
 
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
-
   const otherLocale: Locale = locale === 'ar' ? 'en' : 'ar';
   const langHref = swapLocale(pathname, otherLocale);
 
+  const userLoggedIn = isLoggedIn(pathname);
+  const userType = getUserType(pathname);
+
   const linkBase =
     'text-primary-foreground/90 transition-colors hover:text-link-hover dark:hover:text-white relative underline-offset-8 decoration-2 decoration-link-hover/30 hover:underline';
+
+  // Handle logout
+  function handleLogout() {
+    // Clear any stored auth data (localStorage, cookies, etc.)
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userType');
+    
+    // Redirect to home page
+    router.push(`/${locale}`);
+    setOpen(false);
+  }
 
   return (
     <header dir={isRTL ? 'rtl' : 'ltr'}>
       <nav
         className={cx(
-          "fixed inset-x-0 top-0 z-50 h-16",              // <-- fixed height (64px)
+          "fixed inset-x-0 top-0 z-50 h-16",
           "border-b backdrop-blur-md",
           "bg-primary/65 border-primary/25 dark:bg-primary/70 dark:border-primary/30"
         )}
       >
-        <div className="mx-auto max-w-7xl h-full px-6"> {/* h-full so children can center vertically */}
+        <div className="mx-auto max-w-7xl h-full px-6">
           <div className="flex h-full items-center justify-between">
             {/* right: logo + pages */}
             <div className="flex items-center gap-6">
-              {/* ✅ Only the header wraps in Link */}
               <Link href={`/${locale}`} aria-label="home" className="flex items-center">
                 <Logo />
               </Link>
@@ -99,23 +122,41 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
               </ul>
             </div>
 
-            {/* left: actions (CTA + lang + theme) */}
+            {/* left: actions (CTA + lang) */}
             <div className="hidden lg:flex items-center gap-2">
-              {/* Per your new flow: header CTA is Login */}
-              <Button
-                asChild
-                size="sm"
-                className={cx(
-                  'font-medium',
-                  'bg-[var(--cta,#013D5B)] text-[var(--cta-foreground,#fff)]',
-                  'transition-all duration-200',
-                  'hover:bg-[#013D5B]/90 active:bg-[#013D5B]',
-                  'hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
-                  'rounded-md'
-                )}
-              >
-                <Link href={`/${locale}/login`}>{isRTL ? 'تسجيل الدخول' : 'Log in'}</Link>
-              </Button>
+              {/* Login/Logout Button */}
+              {userLoggedIn ? (
+                <Button
+                  onClick={handleLogout}
+                  size="sm"
+                  className={cx(
+                    'font-medium',
+                    'bg-red-600 text-white',
+                    'transition-all duration-200',
+                    'hover:bg-red-700 active:bg-red-800',
+                    'hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
+                    'rounded-md'
+                  )}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {isRTL ? 'تسجيل الخروج' : 'Logout'}
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="sm"
+                  className={cx(
+                    'font-medium',
+                    'bg-[var(--cta,#013D5B)] text-[var(--cta-foreground,#fff)]',
+                    'transition-all duration-200',
+                    'hover:bg-[#013D5B]/90 active:bg-[#013D5B]',
+                    'hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
+                    'rounded-md'
+                  )}
+                >
+                  <Link href={`/${locale}/login`}>{isRTL ? 'تسجيل الدخول' : 'Log in'}</Link>
+                </Button>
+              )}
 
               {/* Language */}
               <Link
@@ -132,24 +173,6 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
               >
                 {otherLocale.toUpperCase()}
               </Link>
-
-              {/* Theme */}
-              <button
-                onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                aria-label={isRTL ? 'تبديل المظهر' : 'Toggle theme'}
-                title={isRTL ? 'تبديل المظهر' : 'Toggle theme'}
-                className={cx(
-                  'inline-flex h-9 w-9 items-center justify-center rounded-md',
-                  'border border-white/40 dark:border-white/15',
-                  'bg-white/15 dark:bg-white/10',
-                  'backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,.25),0_2px_8px_rgba(0,0,0,.08)]',
-                  'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
-                  'text-primary-foreground'
-                )}
-              >
-                <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </button>
             </div>
 
             {/* mobile toggle */}
@@ -192,15 +215,33 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
               </ul>
 
               <div className="flex items-center gap-2">
-                <Button
-                  asChild
-                  size="sm"
-                  className="font-medium bg-[#013D5B] text-white hover:bg-[#013D5B]/90 transition-all"
-                >
-                  <Link href={`/${locale}/login`} onClick={() => setOpen(false)}>
-                    {isRTL ? 'تسجيل الدخول' : 'Log in'}
-                  </Link>
-                </Button>
+                {/* Mobile Login/Logout Button */}
+                {userLoggedIn ? (
+                  <Button
+                    onClick={handleLogout}
+                    size="sm"
+                    className={cx(
+                      'font-medium',
+                      'bg-red-600 text-white',
+                      'transition-all duration-200',
+                      'hover:bg-red-700 active:bg-red-800',
+                      'rounded-md'
+                    )}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {isRTL ? 'تسجيل الخروج' : 'Logout'}
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    size="sm"
+                    className="font-medium bg-[#013D5B] text-white hover:bg-[#013D5B]/90 transition-all rounded-md"
+                  >
+                    <Link href={`/${locale}/login`} onClick={() => setOpen(false)}>
+                      {isRTL ? 'تسجيل الدخول' : 'Log in'}
+                    </Link>
+                  </Button>
+                )}
 
                 <Link
                   href={langHref}
@@ -216,25 +257,6 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
                 >
                   {otherLocale.toUpperCase()}
                 </Link>
-
-                <button
-                  onClick={() => {
-                    setTheme(isDark ? 'light' : 'dark');
-                    setOpen(false);
-                  }}
-                  aria-label={isRTL ? 'تبديل المظهر' : 'Toggle theme'}
-                  className={cx(
-                    'inline-flex h-9 w-9 items-center justify-center rounded-md',
-                    'border border-white/40 dark:border-white/15',
-                    'bg-white/15 dark:bg-white/10',
-                    'backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,.25),0_2px_8px_rgba(0,0,0,.08)]',
-                    'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0',
-                    'text-primary-foreground'
-                  )}
-                >
-                  <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                </button>
               </div>
             </div>
           </div>

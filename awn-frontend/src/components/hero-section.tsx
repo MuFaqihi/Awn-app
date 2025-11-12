@@ -14,7 +14,6 @@ const content = {
       'تجعل عَون العلاج الطبيعي متاحًا للجميع. اكتشف الأخصائيين المرخّصين، واحجز الجلسات التي تناسب جدولك، وابدأ رحلة تعافٍ واثقة — كل ذلك في مكان واحد.',
     ctaPrimary: 'تصفّح المختصّين',
     ctaTherapist: 'دخول المختصّ',
-    // 👇 Three strong, “real” highlights (edit the copy to match your doc wording)
     highlights: [
       {
         title: 'أخصائيون مرخّصون',
@@ -33,7 +32,7 @@ const content = {
       },
     ],
     toTherapists: (l: string) => `/${l}/therapists`,
-    toTherapistLogin: (l: string) => `/${l}/login?role=therapist`,
+    toTherapistLogin: (l: string) => `/${l}/therapist-login`, // ✅ Fixed URL
   },
   en: {
     title: 'Book trusted physiotherapy with ease',
@@ -54,12 +53,12 @@ const content = {
       },
       {
         title: 'Personalized care plan',
-        desc: 'Clinic or Riyadh home visits with tailored exercises and follow-ups.',
+        desc: 'Online or Riyadh home visits with tailored exercises and follow-ups.',
         icon: Stethoscope,
       },
     ],
     toTherapists: (l: string) => `/${l}/therapists`,
-    toTherapistLogin: (l: string) => `/${l}/login?role=therapist`,
+    toTherapistLogin: (l: string) => `/${l}/therapist-login`, 
   },
 } as const;
 

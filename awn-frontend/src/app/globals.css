@@ -1,101 +1,86 @@
 @import "tailwindcss";
-/* if you installed it:  @import "tw-animate-css"; */
 
 /* --- Design tokens --- */
-:root {
-    /* CTA dark blue shades */
-  --cta: #013D5B;
-  --cta-hover: #02486B;
-  --cta-active: #012E45;
-  --cta-foreground: #ffffff;
-  --font-cairo: "Cairo", system-ui, sans-serif;
-
+@theme {
+  --color-cta: #013D5B;
+  --color-cta-hover: #02486B;
+  --color-cta-active: #012E45;
+  --color-cta-foreground: #ffffff;
+  
+  --font-family-cairo: "Cairo", system-ui, sans-serif;
   --radius: 10px;
 
   /* neutrals */
-  --background: #ffffff;
-  --foreground: #121212;
-  --border: #e5e7eb;
-  --ring: #a3a3a3;
+  --color-background: #ffffff;
+  --color-foreground: #121212;
+  --color-border: #e5e7eb;
+  --color-ring: #a3a3a3;
 
   /* brand */
-  --primary: #35757F;                 /* teal you used */
-  --primary-foreground: #ffffff;
+  --color-primary: #35757F;
+  --color-primary-foreground: #ffffff;
 
-  --accent:  #E2A674;                 /* secondary sand */
-  --accent-foreground: #1a1a1a;
+  --color-accent: #2e636b;
+  --color-accent-foreground: #1a1a1a;
 
   /* optional supporting */
-  --teal: #30846D;
+  --color-teal: #30846D;
 
-  /* hero background like old project */
-  --hero-bg: radial-gradient(600px 600px at 15% 20%, #35757F 0%, #D4FCFF 70%, transparent 100%),
-             radial-gradient(600px 600px at 85% 15%, #D4FCFF 0%, transparent 70%);
-}
+  /* dark mode */
+  --color-background-dark: #0f1416;
+  --color-foreground-dark: #f5f7f7;
+  --color-border-dark: #263238;
+  --color-ring-dark: #7b8790;
 
-/* dark mode */
-.dark {
-  --background: #0f1416;
-  --foreground: #f5f7f7;
-  --border: #263238;
-  --ring: #7b8790;
+  --color-primary-dark: #2e636b;
+  --color-primary-foreground-dark: #f4f7f7;
 
-  --primary: #2e636b;
-  --primary-foreground: #f4f7f7;
-
-  --accent: #c69364;
-  --accent-foreground: #0f1416;
-
-  --hero-bg: radial-gradient(600px 600px at 15% 20%, #2e636b 0%, #1b2c30 70%, transparent 100%),
-             radial-gradient(600px 600px at 85% 15%, #1b2c30 0%, transparent 70%);
+  --color-accent-dark: #649fc6;
+  --color-accent-foreground-dark: #0f1416;
 }
 
 /* RTL helper */
-html[dir="rtl"] body { direction: rtl; }
-
-/* === Map tokens to Tailwind (v4) === */
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-ring: var(--ring);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  
-   --color-cta: var(--cta);
-  --color-cta-hover: var(--cta-hover);
-  --color-cta-active: var(--cta-active);
-  --color-cta-foreground: var(--cta-foreground);
+html[dir="rtl"] body { 
+  direction: rtl; 
 }
 
-/* === Base layer === */
-@layer base {
-  * { @apply border-border outline-ring/50; }
+/* Base styles */
+* {
+  border-color: var(--color-border);
+  outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  min-height: 100dvh;
+  font-family: var(--font-family-cairo);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  * {
+    border-color: var(--color-border-dark);
+    outline-color: color-mix(in srgb, var(--color-ring-dark) 50%, transparent);
+  }
 
   body {
-    @apply bg-background text-foreground antialiased min-h-dvh;
-    font-family: var(--font-cairo);
-
-    /* optional: global hero background like your old app header section */
-    /* comment this out if you only want the gradient on the hero header container */
-    /* background-image: var(--hero-bg); */
+    background-color: var(--color-background-dark);
+    color: var(--color-foreground-dark);
   }
 }
+
 /* Background utilities for header wrapper */
 .header-bg-dark {
   position: relative;
 }
+
 .header-bg-dark::before {
-  content:"";
-  position:absolute; inset:0; z-index:0;
+  content: "";
+  position: absolute; 
+  inset: 0; 
+  z-index: 0;
   background:
     radial-gradient(circle at 70% 30%, rgba(255,255,255,0.10) 0%, transparent 50%),
     radial-gradient(circle at 30% 70%, rgba(176,196,222,0.15) 0%, transparent 50%),
@@ -103,11 +88,13 @@ html[dir="rtl"] body { direction: rtl; }
   background-blend-mode: soft-light, screen, normal;
   filter: brightness(1.05) contrast(1.05);
 }
+
 .header-bg-light {
   position: relative;
 }
+
 @keyframes crystal-shimmer {
-  0%,100% {
+  0%, 100% {
     background-position: 0% 0%, 0% 0%, 0% 0%, 50% 50%;
     background-size: 10px 10px, 10px 10px, 200% 200%, 200% 200%;
   }
@@ -116,17 +103,23 @@ html[dir="rtl"] body { direction: rtl; }
     background-size: 12px 12px, 12px 12px, 200% 200%, 180% 180%;
   }
 }
+
 .header-bg-light::before {
-  content:"";
-  position:absolute; inset:0; z-index:0;
+  content: "";
+  position: absolute; 
+  inset: 0; 
+  z-index: 0;
   background:
     repeating-linear-gradient(60deg, transparent 0px, transparent 1px, rgba(255,255,255,0.05) 1px, rgba(255,255,255,0.05) 2px),
     repeating-linear-gradient(-60deg, transparent 0px, transparent 1px, rgba(255,255,255,0.05) 1px, rgba(255,255,255,0.05) 2px),
-    linear-gradient(60deg, rgba(43,108,176,0.40) 0%, rgba(72,126,176,0.40) 33%, rgba(95,142,176,0.40) 66%, rgba(116,157,176,0.40) 100%),
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.20) 0%, transparent 50%);
+    linear-gradient(60deg, rgba(43,108,176,0.40) 0%, #487eb066 33%, rgba(95,142,176,0.40) 66%, rgba(116,157,176,0.40) 100%),
+    radial-gradient(circle at 50% 50%, #ffffff33 0%, transparent 50%);
   background-blend-mode: overlay, overlay, normal, screen;
   animation: crystal-shimmer 15s ease-in-out infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .header-bg-light::before { animation: none; }
+  .header-bg-light::before { 
+    animation: none; 
+  }
 }

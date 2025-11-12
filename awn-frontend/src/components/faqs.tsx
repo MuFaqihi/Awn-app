@@ -13,7 +13,7 @@ const AR = {
   subtitle: 'إجابات سريعة حول منصة عون للعلاج الطبيعي',
   searchPlaceholder: 'ابحث في الأسئلة...',
   noResults: 'لا توجد نتائج',
-  contactNote: 'لم تجد إجابة سؤالك؟ تواصل معنا عبر support@awn.sa',
+  contactNote: 'لم تجد إجابة سؤالك؟ تواصل معنا عبر customerserviceawn@gmail.com',
   items: [
     {
       q: 'كيف أحجز موعد مع أخصائي علاج طبيعي؟',
@@ -24,8 +24,8 @@ const AR = {
       a: 'نوفر تخصصات متعددة: العلاج الطبيعي العام، إصابات الرياضة، العلاج العصبي، صحة المرأة، وعلاج الأطفال.',
     },
     {
-      q: 'هل الجلسات في العيادة أم زيارات منزلية؟',
-      a: 'نوفر كلا الخيارين حسب تفضيلك وتوفر الأخصائي. الزيارات المنزلية متاحة في الرياض وجدة والدمام.',
+      q: 'هل الجلسات منزلية أم أونلاين؟',
+      a: 'نوفر الزيارات المنزلية والجلسات الأونلاين حسب تفضيلك وتوفر الأخصائي. الزيارات المنزلية متاحة حالياً في الرياض مع خطط للتوسع.',
     },
     {
       q: 'كيف يتم الدفع وما هي التكاليف؟',
@@ -55,7 +55,7 @@ const EN = {
   subtitle: 'Quick answers about Awn physiotherapy platform',
   searchPlaceholder: 'Search questions...',
   noResults: 'No results found',
-  contactNote: 'Didn\'t find your answer? Contact us at support@awn.sa',
+  contactNote: 'Didn\'t find your answer? Contact us at customerserviceawn@gmail.com',
   items: [
     {
       q: 'How do I book an appointment with a physiotherapist?',
@@ -66,8 +66,8 @@ const EN = {
       a: 'We offer multiple specialties: general physiotherapy, sports injuries, neurological therapy, women\'s health, and pediatric therapy.',
     },
     {
-      q: 'Are sessions in-clinic or home visits?',
-      a: 'We offer both options based on your preference and therapist availability. Home visits are available in Riyadh, Jeddah, and Dammam.',
+     q: 'Are sessions home visits or online?',
+      a: 'We offer both home visits and online sessions based on your preference and therapist availability. Home visits are currently available in Riyadh with plans to expand.',
     },
     {
       q: 'How does payment work and what are the costs?',

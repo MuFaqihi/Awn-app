@@ -32,17 +32,18 @@ export function AnimatedOTPInput({
       if (i > 0) refs.current[i - 1]?.focus();
     }
   }
-React.useEffect(() => {
-  // initialize only when the value is truly empty
-  if (value === '') onChange('_'.repeat(maxLength));
-  // DO NOT depend on `onChange` here; it causes a reset every render
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [maxLength, value]);
+
+  React.useEffect(() => {
+    // initialize only when the value is truly empty
+    if (value === '') onChange('_'.repeat(maxLength));
+    // DO NOT depend on `onChange` here; it causes a reset every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxLength, value]);
 
   const chars = (value || "_".repeat(maxLength)).slice(0, maxLength).split("");
 
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn("flex gap-3", className)}>
       {chars.map((ch, i) => (
         <input
           key={i}
@@ -55,8 +56,15 @@ React.useEffect(() => {
           onChange={(e) => setAt(i, e.target.value.replace(/\D/g, "").slice(0, 1))}
           onKeyDown={(e) => onKey(i, e)}
           className={cn(
-            "h-12 w-10 rounded-md border bg-background text-center text-lg",
-            "focus:outline-none focus:ring-2 focus:ring-primary transition"
+            // Match the form input styling
+            "h-14 w-12 rounded-xl border border-gray-200 bg-white text-center text-xl font-semibold",
+            "focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20",
+            "transition-all duration-200",
+            "dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:border-teal-400",
+            // Add subtle shadow to match form inputs
+            "shadow-sm",
+            // Hover state
+            "hover:border-gray-300 dark:hover:border-gray-500"
           )}
         />
       ))}

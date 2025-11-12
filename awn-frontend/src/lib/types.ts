@@ -25,7 +25,7 @@ export interface Appointment {
   therapistId: string;
   date: string;
   time: string;
-  kind: 'online' | 'clinic' | 'home';
+  kind: 'online' | 'home';
   status: 'upcoming' | 'completed' | 'cancelled';
   place?: string;
   meetLink?: string;
@@ -42,3 +42,7 @@ export interface TreatmentPlan {
 }
 
 export type Locale = 'ar' | 'en';
+export type AuthoredBy = 'user' | 'therapist';
+
+
+export * from '@/lib/medical-history';

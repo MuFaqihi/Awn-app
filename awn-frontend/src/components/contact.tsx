@@ -53,7 +53,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-base">
             {isAr
               ? "سنساعدك في اختيار الخطة المناسبة والإجابة عن استفساراتك حول عون."
-              : "We’ll help you choose the right plan and answer any questions about Awn."}
+              : "We'll help you choose the right plan and answer any questions about Awn."}
           </p>
         </div>
       </div>
@@ -130,9 +130,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                     <SelectItem value="therapist">
                       {isAr ? "أخصائي علاج طبيعي" : "Physiotherapist"}
                     </SelectItem>
-                    <SelectItem value="clinic">
-                      {isAr ? "منشأة صحية" : "Clinic / Medical center"}
-                    </SelectItem>
+                    
                     <SelectItem value="other">
                       {isAr ? "أخرى" : "Other"}
                     </SelectItem>
@@ -209,9 +207,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                     <SelectItem value="verification">
                       {isAr ? "توثيق الأخصائيين" : "Therapist verification"}
                     </SelectItem>
-                    <SelectItem value="partnership">
-                      {isAr ? "شراكات/منشآت صحية" : "Partnerships / Clinics"}
-                    </SelectItem>
+                    
                     <SelectItem value="pricing">
                       {isAr ? "الأسعار والباقات" : "Pricing & plans"}
                     </SelectItem>
@@ -263,7 +259,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
               <p className="text-sm text-green-600">
                 {isAr
                   ? "تم استلام رسالتك وسنعاود التواصل معك قريبًا."
-                  : "Your message has been sent. We’ll get back to you soon."}
+                  : "Your message has been sent. We'll get back to you soon."}
               </p>
             )}
           </form>
@@ -280,13 +276,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                 <span className="text-muted-foreground">
                   {isAr ? "البريد:" : "Email:"}
                 </span>{" "}
-                support@awn.sa
-              </li>
-              <li>
-                <span className="text-muted-foreground">
-                  {isAr ? "الهاتف:" : "Phone:"}
-                </span>{" "}
-                +966 55 000 0000
+                customerserviceawn@gmail.com
               </li>
               <li>
                 <span className="text-muted-foreground">
@@ -301,27 +291,30 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
             <div className="space-y-3 text-sm">
               <p className="text-muted-foreground">
                 {isAr
-                  ? "إذا كان استفسارك عاجلًا، يُفضّل التواصل عبر الهاتف."
-                  : "For urgent inquiries, please call us directly."}
+                  ? "إذا كان استفسارك عاجلًا، يُفضّل التواصل عبر البريد الإلكتروني."
+                  : "For urgent inquiries, please email us directly."}
               </p>
-              <Button variant="outline" className="w-full">
-                {isAr ? "الدعم عبر واتساب" : "WhatsApp Support"}
-              </Button>
             </div>
           </Card>
 
-          <Card className="p-6 sm:p-8">
-            <h3 className="text-base font-semibold">
+          <Card className="p-6 sm:p-8 min-h-[400px] flex flex-col">
+            <h3 className="text-base font-semibold mb-8">
               {isAr ? "الأسئلة الشائعة" : "Quick help"}
             </h3>
-            <ul className="mt-3 list-disc ps-5 text-sm text-muted-foreground space-y-1.5">
-              <li>{isAr ? "مشاكل الدفع والحجز" : "Payment & booking issues"}</li>
-              <li>{isAr ? "توثيق الأخصائيين" : "Therapist verification"}</li>
-              <li>{isAr ? "الأسعار والباقات" : "Pricing & plans"}</li>
-            </ul>
-            <Button asChild className="mt-4 w-full" style={{ backgroundColor: BRAND }}>
-              <a href={`/${locale}/faq`}>{isAr ? "استكشف المساعدة" : "Explore help"}</a>
-            </Button>
+            
+            <div className="flex-1 flex flex-col justify-between">
+              <ul className="list-disc ps-5 text-sm text-muted-foreground space-y-6">
+                <li className="leading-relaxed">{isAr ? "كيفية حجز موعد مع أخصائي" : "How to book therapist appointments"}</li>
+                <li className="leading-relaxed">{isAr ? "أنواع العلاج الطبيعي المتوفرة" : "Available physiotherapy types"}</li>
+                <li className="leading-relaxed">{isAr ? "الجلسات المنزلية والأونلاين" : "Home visits and online sessions"}</li>
+                <li className="leading-relaxed">{isAr ? "طرق الدفع والتكاليف" : "Payment methods and costs"}</li>
+                <li className="leading-relaxed">{isAr ? "إلغاء وتأجيل المواعيد" : "Canceling and rescheduling"}</li>
+              </ul>
+              
+              <Button asChild className="mt-8 w-full" style={{ backgroundColor: BRAND }}>
+                <a href={`/${locale}/faq`}>{isAr ? "استكشف المساعدة" : "Explore help"}</a>
+              </Button>
+            </div>
           </Card>
         </div>
       </div>

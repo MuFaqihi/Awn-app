@@ -28,8 +28,7 @@ export default function CallToAction({ locale = 'ar' }: { locale?: Locale }) {
       }
     : {
         title: 'Start your care with confidence',
-        subtitle:
-          'Find a licensed therapist and book in minutes — in-clinic, at home, or online.',
+     subtitle: 'Discover qualified therapists and book your session quickly — choose home visits or online consultations.',
         primary: 'Start booking',
         secondary: 'Therapist sign-in',
         fine: 'No app required — everything in your browser.',

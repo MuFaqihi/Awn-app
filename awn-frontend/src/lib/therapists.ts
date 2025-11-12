@@ -1,129 +1,125 @@
-import type { Therapist } from './types';
-
-// Mock physiotherapy data - replace this with your real source (DB/API/JSON)
-const therapists: Therapist[] = [
+// Updated therapist data with correct availability structure
+const therapists = [
   {
-    id: "t_dr_mona",
-    name: "Dr. Mona Ahmed",
-    nameAr: "د. منى أحمد",
-    specialty: "Sports Physiotherapy",
-    specialtyAr: "العلاج الطبيعي الرياضي",
-    avatar: "/avatars/dr-mona.jpg",
+    id: "ahmed-alotaibi",
+    name: {
+      en: "Dr. Ahmed Al-Otaibi",
+      ar: "د. أحمد العتيبي"
+    },
+    specialties: ["Sports Physiotherapy", "العلاج الطبيعي الرياضي"],
+    image: "/Ahmed.png",
     rating: 4.8,
     experience: 8,
-    location: "Riyadh",
-    locationAr: "الرياض",
-    bio: "Specialized in sports injuries and rehabilitation",
-    bioAr: "متخصصة في إصابات الرياضة والتأهيل",
+    location: {
+      en: "Riyadh",
+      ar: "الرياض"
+    },
+    bio: {
+      en: "Specialized in sports injuries and rehabilitation",
+      ar: "متخصص في إصابات الرياضة والتأهيل"
+    },
     price: 200,
     currency: "SAR",
-    isOnline: true,
-    isClinic: true,
+    availability: {
+      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
+    },
     languages: ["Arabic", "English"],
     education: ["DPT - King Saud University", "MSc Sports Medicine"],
     certifications: ["Licensed Physiotherapist", "Sports Injury Specialist"],
   },
   {
-    id: "t_dr_basel",
-    name: "Dr. Basel Hassan",
-    nameAr: "د. باسل حسان",
-    specialty: "Orthopedic Physiotherapy",
-    specialtyAr: "العلاج الطبيعي العظمي",
-    avatar: "/avatars/dr-basel.jpg",
+    id: "sarah-alshahri",
+    name: {
+      en: "Dr. Sarah Al-Shahri",
+      ar: "د. سارة الشهري"
+    },
+    specialties: ["Orthopedic Physiotherapy", "العلاج الطبيعي العظمي"],
+    image: "/Amani.png",
     rating: 4.9,
     experience: 12,
-    location: "Riyadh",
-    locationAr: "الرياض",
-    bio: "Expert in post-surgical rehabilitation and manual therapy",
-    bioAr: "خبير في التأهيل بعد العمليات والعلاج اليدوي",
+    location: {
+      en: "Riyadh",
+      ar: "الرياض"
+    },
+    bio: {
+      en: "Expert in post-surgical rehabilitation and manual therapy",
+      ar: "خبيرة في التأهيل بعد العمليات والعلاج اليدوي"
+    },
     price: 250,
     currency: "SAR",
-    isOnline: true,
-    isClinic: true,
+    availability: {
+      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
+    },
     languages: ["Arabic", "English"],
     education: ["DPT - University of Toronto", "Fellowship in Manual Therapy"],
     certifications: ["Licensed Physiotherapist", "Manual Therapy Specialist", "Orthopedic Clinical Specialist"],
   },
   {
-    id: "t_dr_sara",
-    name: "Dr. Sara Al-Mansouri",
-    nameAr: "د. سارة المنصوري",
-    specialty: "Neurological Physiotherapy",
-    specialtyAr: "العلاج الطبيعي العصبي",
-    avatar: "/avatars/dr-sara.jpg",
+    id: "faisal-almutairi",
+    name: {
+      en: "Dr. Faisal Al-Mutairi",
+      ar: "د. فيصل المطيري"
+    },
+    specialties: ["Neurological Physiotherapy", "العلاج الطبيعي العصبي"],
+    image: "/Faisal.png",
     rating: 4.7,
     experience: 10,
-    location: "Jeddah",
-    locationAr: "جدة",
-    bio: "Specialized in stroke recovery and neurological conditions",
-    bioAr: "متخصصة في التعافي من السكتة الدماغية والحالات العصبية",
+    location: {
+      en: "Jeddah",
+      ar: "جدة"
+    },
+    bio: {
+      en: "Specialized in stroke recovery and neurological conditions",
+      ar: "متخصص في التعافي من السكتة الدماغية والحالات العصبية"
+    },
     price: 220,
     currency: "SAR",
-    isOnline: true,
-    isClinic: true,
+    availability: {
+      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
+      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
+    },
     languages: ["Arabic", "English"],
     education: ["DPT - King Abdulaziz University", "MSc Neurological Rehabilitation"],
     certifications: ["Licensed Physiotherapist", "Neurological Clinical Specialist"],
   },
-  {
-    id: "t_dr_ahmed",
-    name: "Dr. Ahmed Al-Rashid",
-    nameAr: "د. أحمد الراشد",
-    specialty: "Pediatric Physiotherapy",
-    specialtyAr: "العلاج الطبيعي للأطفال",
-    avatar: "/avatars/dr-ahmed.jpg",
-    rating: 4.6,
-    experience: 7,
-    location: "Dammam",
-    locationAr: "الدمام",
-    bio: "Specialized in developmental delays and pediatric conditions",
-    bioAr: "متخصص في تأخر النمو وحالات الأطفال",
-    price: 180,
-    currency: "SAR",
-    isOnline: false,
-    isClinic: true,
-    languages: ["Arabic", "English"],
-    education: ["DPT - Imam Abdulrahman University", "Pediatric Physiotherapy Certificate"],
-    certifications: ["Licensed Physiotherapist", "Pediatric Clinical Specialist"],
-  },
 ];
 
-export function getTherapistById(id: string): Therapist | undefined {
-  return therapists.find(t => t.id === id);
+export function getTherapistById(id: string) {
+  return therapists.find(t => t.id === id) || null;
 }
 
-export function getAllTherapists(): Therapist[] {
+export function getAllTherapists() {
   return therapists;
 }
 
-export function getTherapistsBySpecialty(specialty: string): Therapist[] {
+export function getTherapistsBySpecialty(specialty: string) {
   return therapists.filter(t => 
-    t.specialty.toLowerCase().includes(specialty.toLowerCase()) ||
-    t.specialtyAr.includes(specialty)
+    t.specialties.some(s => s.toLowerCase().includes(specialty.toLowerCase()))
   );
 }
 
-export function searchTherapists(query: string): Therapist[] {
+export function searchTherapists(query: string) {
   const lowercaseQuery = query.toLowerCase();
   return therapists.filter(t => 
-    t.name.toLowerCase().includes(lowercaseQuery) ||
-    t.nameAr.includes(query) ||
-    t.specialty.toLowerCase().includes(lowercaseQuery) ||
-    t.specialtyAr.includes(query)
+    t.name.en.toLowerCase().includes(lowercaseQuery) ||
+    t.name.ar.includes(query) ||
+    t.specialties.some(s => s.toLowerCase().includes(lowercaseQuery))
   );
 }
 
-export function getTherapistsByLocation(location: string): Therapist[] {
+export function getTherapistsByLocation(location: string) {
   return therapists.filter(t => 
-    t.location.toLowerCase().includes(location.toLowerCase()) ||
-    t.locationAr.includes(location)
+    t.location.en.toLowerCase().includes(location.toLowerCase()) ||
+    t.location.ar.includes(location)
   );
 }
 
-export function getOnlineTherapists(): Therapist[] {
-  return therapists.filter(t => t.isOnline);
+export function getOnlineTherapists() {
+  return therapists.filter(t => t.availability.online && t.availability.online.length > 0);
 }
 
-export function getClinicTherapists(): Therapist[] {
-  return therapists.filter(t => t.isClinic);
+export function getHomeVisitTherapists() {
+  return therapists.filter(t => t.availability.home && t.availability.home.length > 0);
 }
