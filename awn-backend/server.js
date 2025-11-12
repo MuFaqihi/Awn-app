@@ -38,7 +38,8 @@ app.use('/api/contacts', require('./routes/contacts'));
 
 // التقييمات
 app.use('/api/ratings', require('./routes/ratings'));
-
+// OTP
+app.use('/api/auth', require('./routes/auth-verify'));
 // المفضلة
 app.use('/api/favorites', require('./routes/favorites'));
 
