@@ -13,8 +13,8 @@ const supabase = createClient(
 router.post('/register', async (req, res) => {
   try {
     const {
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       password,
       confirmPassword,
@@ -54,8 +54,8 @@ router.post('/register', async (req, res) => {
       .insert([
         {
          
-          firstName,
-          lastName,
+          first_name,
+          last_name,
           email,
           password_hash: hashedPassword,
           login_attempts: 0,
