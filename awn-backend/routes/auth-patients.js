@@ -13,22 +13,16 @@ const supabase = createClient(
 router.post('/register', async (req, res) => {
   try {
     const {
-      national_id,
       first_name,
       last_name,
       email,
-      phone,
-      date_of_birth,
-      gender,
-      city,
-      emergency_contact,
       password
     } = req.body;
 
-    console.log('محاولة تسجيل مريض جديد:', national_id);
+    console.log('محاولة تسجيل مريض جديد:', !email);
 
     // التحقق من البيانات المطلوبة
-    if (!national_id || !first_name || !last_name || !email || !phone || !password) {
+    if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
         error: 'بيانات ناقصة',
@@ -37,18 +31,18 @@ router.post('/register', async (req, res) => {
     }
 
     // التحقق من عدم وجود مريض مسجل مسبقاً
-    const { data: existingPatient, error: checkError } = await supabase
-      .from('patients')
-      .select('national_id')
-      .eq('national_id', national_id)
-      .single();
+   // const { data: existingPatient, error: checkError } = await supabase
+    //  .from('patients')
+    //  .select('national_id')
+    //  .eq('national_id', national_id)
+    //  .single();
 
-    if (existingPatient) {
-      return res.status(409).json({
-        success: false,
-        error: 'الرقم الوطني مسجل مسبقاً'
-      });
-    }
+   // if (existingPatient) {
+   //   return res.status(409).json({
+      //  success: false,
+       // error: 'الرقم الوطني مسجل مسبقاً'
+     // });
+   // }
 
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -58,15 +52,10 @@ router.post('/register', async (req, res) => {
       .from('patients')
       .insert([
         {
-          national_id,
+         
           first_name,
           last_name,
           email,
-          phone,
-          date_of_birth,
-          gender,
-          city,
-          emergency_contact,
           password_hash: hashedPassword,
           login_attempts: 0,
           account_locked: false
@@ -93,7 +82,6 @@ router.post('/register', async (req, res) => {
       message: 'تم تسجيل حسابك بنجاح',
       token,
       patient: {
-        national_id: patient.national_id,
         first_name: patient.first_name,
         last_name: patient.last_name,
         email: patient.email
@@ -154,7 +142,7 @@ router.post('/login', async (req, res) => {
           login_attempts: newAttempts,
           account_locked: shouldLockAccount
         })
-        .eq('national_id', patient.national_id);
+        .eq('national_id', patient.email);
 
       return res.status(401).json({
         success: false,
@@ -171,27 +159,24 @@ router.post('/login', async (req, res) => {
         login_attempts: 0,
         last_login: new Date()
       })
-      .eq('national_id', patient.national_id);
+      .eq('national_id', patient.email);
 
     // إنشاء token
     const token = generateToken({ 
-      patientId: patient.national_id,
+      patientId: patient.email,
       type: 'patient'
     });
 
-    console.log('تم تسجيل الدخول بنجاح:', patient.national_id);
+    console.log('تم تسجيل الدخول بنجاح:', patient.email);
 
     res.json({
       success: true,
       message: 'تم تسجيل الدخول بنجاح',
       token,
       patient: {
-        national_id: patient.national_id,
         first_name: patient.first_name,
         last_name: patient.last_name,
         email: patient.email,
-        phone: patient.phone,
-        city: patient.city
       }
     });
 
