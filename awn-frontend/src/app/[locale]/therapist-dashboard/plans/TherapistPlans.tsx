@@ -154,11 +154,7 @@ export default function TherapistPlansClient({ locale }: { locale: Locale }) {
   const handleCommitmentChange = (id: string, value: "high" | "medium" | "low") => {
     setPlans((prev) => prev.map((p) => (p.id === id ? { ...p, commitment: value } : p)));
   };
-
-  const handleContactPatient = (name: string) => {
-    alert(ar ? `تم فتح المحادثة مع ${name}` : `Chat opened with ${name}`);
-  };
-
+  
   const handleAddStep = (target: "new" | "edit") => {
     if (target === "new") setNewPlan((s) => ({ ...s, steps: [...s.steps, ""] }));
     else if (editingPlan)
@@ -606,11 +602,6 @@ export default function TherapistPlansClient({ locale }: { locale: Locale }) {
                     <Button size="sm" variant="outline" onClick={() => { setSelectedPlan(plan); setNoteDialog(true); }}>
                       <MessageCircle className="h-4 w-4" />
                       {ar ? "ملاحظة" : "Note"}
-                    </Button>
-
-                    <Button size="sm" onClick={() => handleContactPatient(plan.patientName)} variant="outline">
-                      <User className="h-4 w-4" />
-                      {ar ? "مراسلة" : "Contact"}
                     </Button>
 
                     {!completed && plan.status !== "pending" && (

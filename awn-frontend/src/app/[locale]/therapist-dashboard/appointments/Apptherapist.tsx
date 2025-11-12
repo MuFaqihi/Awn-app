@@ -78,9 +78,7 @@ const [appointments, setAppointments] = useState<TherapistAppointment[]>(patient
   const handleStartSession = (apt: TherapistAppointment) => {
     if (apt.kind === "online") {
       window.open(apt.meetLink || "https://meet.google.com/new", "_blank");
-    } else {
-      alert(ar ? "تم بدء الجلسة في المنزل." : "Session started at patient’s home.");
-    }
+   }
   };
 
   const handleApproveConfirm = () => {

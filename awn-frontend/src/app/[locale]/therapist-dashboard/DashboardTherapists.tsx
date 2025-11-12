@@ -175,8 +175,7 @@ export default function TherapistDashboard({ locale }: Props) {
   const handleStartSession = (apt: TherapistAppointment) => {
     if (apt.kind === "online") {
       window.open(apt.meetLink || "https://meet.google.com/new", "_blank");
-    } else {
-      alert(ar ? "تم بدء الجلسة في المنزل." : "Session started at patient’s home.");
+      
     }
   };
   const handleRescheduleSave = () => {
@@ -235,10 +234,7 @@ export default function TherapistDashboard({ locale }: Props) {
     if (notesFilter === "1m") return diffDays <= 31;
     if (notesFilter === "3m") return diffDays <= 93;
     return true;
-  });
-  
-  // **التعديل المطلوب 1: قائمة أسماء المرضى الفريدة**
-  // يتم جلب الأسماء بناءً على اللغة المحددة
+  });  
   const allPatientNames = Array.from(new Set(appointments.map(a => ar ? a.patientName : a.patientNameEn)));
 
   const openAddNoteFor = (patientName: string) => {
@@ -249,7 +245,6 @@ export default function TherapistDashboard({ locale }: Props) {
   };
 
   const openEditNote = (note: SessionNote) => {
-    // نعرض الاسم باللغة المطلوبة في حقل المريض
     setNotePatient(ar ? note.patientName : note.patientNameEn); 
     setNoteText(note.note);
     setIsEditingNote(true);
@@ -259,23 +254,17 @@ export default function TherapistDashboard({ locale }: Props) {
   const saveNote = () => {
     if (!notePatient || !noteText.trim()) return;
 
-    // في حالة التحرير، لا نحتاج لتغيير الاسم، فقط الملاحظة
-    if (isEditingNote) {
+   if (isEditingNote) {
       // Find the note that was clicked and update it
       setSessionNotes((p) => p.map((n) => (n.id === openNoteId ? { ...n, note: noteText } : n)));
     } else {
-      // عند إضافة ملاحظة جديدة، نحتاج للتأكد من حفظ الاسم بالعربية والإنجليزية
-      // يجب أن نجد الاسم المقابل لـ notePatient (الذي هو حالياً باللغة المعروضة)
-      // سنفترض أننا سنحفظ الاسم الذي تم اختياره (باللغة المعروضة)، ولكن يجب البحث عن النسختين.
-      // بما أننا نستخدم "patientName" في هذا المكان فقط (كعرض)، سنستخدم القيمة المعروضة.
-      // *لحل مشكلة تعدد اللغات في الإضافة الجديدة بشكل صحيح، يجب إعادة البحث عن الكائن*
-      // بما أننا لا نستطيع إجراء بحث عكسي بسيط هنا، سنبقيها كما هي حالياً، مع ملاحظة أن الإضافة الجديدة ستستخدم الاسم الحالي المعروض فقط (أحد اللغتين).
+
       setSessionNotes((p) => [
         ...p,
         { 
           id: `note_${Date.now()}`, 
-          patientName: notePatient, // هذا قد يكون بالإنجليزية أو العربية
-          patientNameEn: notePatient, // يجب تصحيحه لاحقاً إذا لزم الأمر، ولكن نلتزم بطلبك عدم تغيير منطق الكود
+          patientName: notePatient, 
+          patientNameEn: notePatient, 
           appointmentDate: new Date().toISOString().split("T")[0], 
           note: noteText 
         },
@@ -370,12 +359,12 @@ export default function TherapistDashboard({ locale }: Props) {
                   <Card key={apt.id} className="p-4 mb-3">
                     <div className="flex **flex-col sm:flex-row** justify-between items-start **sm:items-center** gap-3 w-full"> {/* ✨ تعديل: عمودي على الهاتف */}
                       <div>
-                        {/* ✨ التعديل هنا: عرض الاسم بناءً على اللغة */}
+
                         <h3 className="font-semibold">{ar ? apt.patientName : apt.patientNameEn}</h3>
                         <p className="text-sm text-gray-600">{formatDate(apt.date)} • {apt.time}</p>
                         <div className="text-sm text-gray-600 mt-1">{apt.kind === "online" ? (ar ? "عن بُعد" : "Online") : (ar ? "في المنزل" : "Home")}</div>
                       </div>
-                      <div className="flex gap-2 **flex-col sm:flex-row** w-full sm:w-auto"> {/* ✨ تعديل: عمودي على الهاتف */}
+                      <div className="flex gap-2 **flex-col sm:flex-row** w-full sm:w-auto"> 
                         <Button onClick={() => { setSelectedApt(apt); setApproveConfirmOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
                           <CheckCircle className="h-4 w-4 mr-1" />{ar ? "قبول" : "Approve"}
                         </Button>
@@ -401,7 +390,7 @@ export default function TherapistDashboard({ locale }: Props) {
                   <Card key={apt.id} className="p-4 mb-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        {/* ✨ التعديل هنا: عرض الاسم بناءً على اللغة */}
+
                         <h3 className="font-semibold">{ar ? apt.patientName : apt.patientNameEn}</h3>
                         <p className="text-sm text-gray-600">{formatDate(apt.date)} • {apt.time}</p>
                         <div className="text-sm text-gray-600 mt-1 flex items-center gap-3">
@@ -411,9 +400,9 @@ export default function TherapistDashboard({ locale }: Props) {
                           <div className="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded border">{ar ? "سبب الإلغاء: " : "Cancellation reason: "}{apt.cancelReason}</div>
                         )}
                       </div>
-                      <div className="flex flex-col items-end"> {/* ✨ تعديل: وضعهم في عمود والمحاذاة لليمين/اليسار */}
-                        {getStatusBadge(apt.status)}
-                        {/* <Button size="sm" variant="ghost" className="mt-2" onClick={() => openAddNoteFor(apt.patientName)}>{ar ? "إضافة ملاحظة" : "Add Note"}</Button> */}
+                      <div className="flex flex-col items-end">
+                  
+                      {getStatusBadge(apt.status)}
                       </div>
                     </div>
                   </Card>
@@ -465,12 +454,12 @@ export default function TherapistDashboard({ locale }: Props) {
                     onClick={() => setOpenNoteId(openNoteId === n.id ? null : n.id)} // Toggle visibility
                   >
                     <div className="flex justify-between items-center w-full">
-                      <div className="flex items-center gap-2">
-                        {/* ✨ التعديل هنا: عرض الاسم بناءً على اللغة */}
+    
+                    <div className="flex items-center gap-2">
                         <span className="font-medium text-base">{ar ? n.patientName : n.patientNameEn}</span>
                         <span className="text-sm text-gray-500">{formatDate(n.appointmentDate)}</span>
-                      </div>
-                      {/* ✨ تعديل محاذاة الأيقونة للـ RTL */}
+                      
+              </div>
                       <ChevronRight className={`h-4 w-4 transition-transform ${
                         openNoteId === n.id 
                           ? 'rotate-90' 
