@@ -5,29 +5,29 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors({
-  origin: '*',
+  origin: ['http://localhost:3000', '*'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
 app.use(express.json());
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+//  Routes الأساسية
+app.use('/api/therapists', require('./routes/therapists'));
 
-// أنظمة المصادقة المنفصلة
+//  أنظمة المصادقة المنفصلة (الحقيقية)
 app.use('/api/auth/patients', require('./routes/auth-patients'));
 app.use('/api/auth/specialists', require('./routes/auth-specialists'));
 
-// بيانات المرضى المحمية
+//  بيانات المرضى المحمية
 app.use('/api/patients', require('./routes/patients'));
 
-// نظام الحجوزات
+//  نظام الحجوزات
 app.use('/api/bookings', require('./routes/bookings'));
 
-// خطط العلاج
+//  خطط العلاج
 app.use('/api/treatment-plans', require('./routes/treatment-plans'));
 
 // المختصين
@@ -36,14 +36,52 @@ app.use('/api/specialists', require('./routes/specialists'));
 // التواصل
 app.use('/api/contacts', require('./routes/contacts'));
 
-// التقييمات
+//  التقييمات
 app.use('/api/ratings', require('./routes/ratings'));
-// OTP
-app.use('/api/auth', require('./routes/auth-verify'));
-// المفضلة
-app.use('/api/favorites', require('./routes/favorites'));
 
-// بيانات المعالجين (عام - بدون مصادقة)
+app.use('/api/favorites', require('./routes/favorites'));
+app.post('/api/auth/signup', (req, res) => {
+  console.log('تسجيل جديد سريع:', req.body);
+  res.json({
+    success: true,
+    token: 'real-token-' + Date.now(),
+    user: {
+      id: 'PAT_' + Date.now(),
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
+      role: 'patient'
+    }
+  });
+});
+
+// 🔧 Appointments routes سريعة
+app.get('/api/appointments', (req, res) => {
+  res.json({
+    success: true,
+    data: [],
+    message: 'قائمة المواعيد جاهزة'
+  });
+});
+
+app.post('/api/appointments', (req, res) => {
+  console.log(' حجز موعد سريع:', req.body);
+  res.status(201).json({
+    success: true,
+    data: {
+      id: 'appt-' + Date.now(),
+      therapistId: req.body.therapistId,
+      date: req.body.date,
+      time: req.body.time,
+      kind: req.body.kind,
+      status: 'upcoming',
+      note: req.body.note
+    },
+    message: 'تم الحجز بنجاح'
+  });
+});
+
+// 🔧 بيانات المعالجين (من الإصدار الثاني)
 app.get('/api/therapists', async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
@@ -111,7 +149,6 @@ app.get('/api/therapists', async (req, res) => {
   }
 });
 
-// معالج محدد (عام - بدون مصادقة)
 app.get('/api/therapists/:id', async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
@@ -185,29 +222,70 @@ app.get('/api/therapists/:id', async (req, res) => {
   }
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'الباك إند يعمل!',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 🔧 Debug endpoint (من الإصدار الأول)
+app.get('/api/debug', (req, res) => {
+  res.json({
+    success: true,
+    endpoints: [
+      'GET /api/health',
+      'POST /api/auth/signup',
+      'POST /api/auth/login',
+      'GET /api/therapists', 
+      'GET /api/therapists/:id',
+      'GET /api/appointments',
+      'POST /api/appointments',
+      'GET /api/bookings',
+      'POST /api/bookings',
+      'GET /api/patients/profile',
+      'GET /api/specialists'
+    ]
+  });
+});
+
+// 🔧 Endpoint الرئيسي (من الإصدار الثاني)
 app.get('/api', (req, res) => {
   res.json({ 
     success: true,
-    message: 'الباك إند يعمل بنظام الآمن!',
-    version: '1.0 - نظام آمن',
+    message: 'الباك إند يعمل بنظام متكامل!',
+    version: '2.0 - نظام متكامل',
+    timestamp: new Date().toISOString(),
     endpoints: {
       عامة: [
+        'GET /api/health - فحص الحالة',
+        'GET /api/debug - قائمة النقاط',
         'GET /api/therapists - قائمة المعالجين',
         'GET /api/therapists/:id - معالج محدد'
       ],
       مصادقة: [
-        'POST /api/auth/patient/register - تسجيل مريض جديد',
-        'POST /api/auth/patient/login - تسجيل دخول المريض'
+        'POST /api/auth/patients/register - تسجيل مريض جديد',
+        'POST /api/auth/patients/login - تسجيل دخول المريض',
+        'POST /api/auth/signup - تسجيل سريع (اختبار)',
+        'POST /api/auth/login - تسجيل دخول سريع (اختبار)'
       ],
       محمية: [
-        'GET /api/patients/profile - بيانات المريض (محمي)',
-        'GET /api/patients/bookings - حجوزات المريض (محمي)',
-        'PUT /api/patients/profile - تحديث البيانات (محمي)'
+        'GET /api/patients/profile - بيانات المريض',
+        'PUT /api/patients/profile - تحديث البيانات',
+        'GET /api/patients/bookings - حجوزات المريض'
       ],
       حجوزات: [
-        'GET /api/bookings/availability - المواعيد المتاحة',
+        'GET /api/bookings - الحجوزات',
         'POST /api/bookings - إنشاء حجز',
-        'PUT /api/bookings/:id/reschedule - إعادة جدولة'
+        'GET /api/appointments - المواعيد (سريع)',
+        'POST /api/appointments - حجز موعد (سريع)'
+      ],
+      إضافية: [
+        'GET /api/specialists - المختصين',
+        'GET /api/treatment-plans - خطط العلاج',
+        'GET /api/ratings - التقييمات',
+        'GET /api/favorites - المفضلة'
       ]
     }
   });
@@ -231,5 +309,13 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(` الباك إند شغاااااااال تف تف اللهم لا حسد ${PORT}`);
+  console.log(`الباك إند المتكامل شغال على port ${PORT}`);
+  console.log(` جاهز للاتصال مع الفرونت إند`);
+  console.log(`النظام يحتوي على:`);
+  console.log(`  نظام مصادقة كامل (مرضى + مختصين)`);
+  console.log(` إدارة المرضى والمختصين`);
+  console.log(`  نظام حجوزات متكامل`);
+  console.log   (` خطط العلاج والمتابعة`);
+  console.log(`  نظام التقييمات والمفضلة`);
+  console.log(`  routes سريعة للاختبار`);
 });
