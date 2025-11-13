@@ -42,7 +42,7 @@ export default function Component() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2" align="start">
-            <Calendar mode="single" selected={date} onSelect={setDate} />
+            <Calendar selected={date} onSelect={setDate} />
           </PopoverContent>
         </Popover>
       </div>

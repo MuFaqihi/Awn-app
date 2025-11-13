@@ -30,7 +30,7 @@ function swapLocale(path: string, to: Locale) {
   const parts = path.split('/');
   if (parts[1] === 'ar' || parts[1] === 'en') parts[1] = to;
   else parts.splice(1, 0, to);
-  return parts.join('/');
+  return ('/' + parts.filter(Boolean).join('/')).replace(/\/+/g, '/');
 }
 
 function cx(...classes: (string | false | null | undefined)[]) {
@@ -67,6 +67,9 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
 
   const otherLocale: Locale = locale === 'ar' ? 'en' : 'ar';
   const langHref = swapLocale(pathname, otherLocale);
+
+  // deterministic href builder to avoid server/client mismatch (collapses duplicate slashes)
+  const buildHref = (...parts: Array<string | undefined | null>) => ('/' + parts.filter(Boolean).join('/')).replace(/\/+/g, '/');
 
   const userLoggedIn = isLoggedIn(pathname);
   const userType = getUserType(pathname);
@@ -106,7 +109,7 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
               <ul className="hidden lg:flex items-center gap-6 text-sm">
                 {nav.map((item) => {
                   const active = isActive(pathname, locale, item.path);
-                  const href = `/${locale}/${item.path}`.replace(/\/+$/, '') || `/${locale}`;
+                  const href = buildHref(locale, item.path) || `/${locale}`;
                   return (
                     <li key={item.name}>
                       <Link
@@ -193,7 +196,7 @@ export default function SiteHeader({ locale = 'ar' }: { locale?: Locale }) {
               <ul className="space-y-4 text-base">
                 {nav.map((item) => {
                   const active = isActive(pathname, locale, item.path);
-                  const href = `/${locale}/${item.path}`.replace(/\/+$/, '') || `/${locale}`;
+                  const href = buildHref(locale, item.path) || `/${locale}`;
                   return (
                     <li key={item.name}>
                       <Link

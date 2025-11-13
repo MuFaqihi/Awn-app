@@ -3,10 +3,10 @@ import { Cairo } from "next/font/google";
 import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import "../globals.css";
-import Header from "@/components/header";          // client component
-import FooterSection from "@/components/footer";   // <-- import the named default correctly
+import Header from "@/components/header";
+import FooterSection from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ToastProvider } from "@/components/ui/base-toast"
+import { ToastProvider } from "@/components/ui/base-toast";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -19,20 +19,20 @@ export const metadata: Metadata = {
   description: "Physical Therapy Platform",
 };
 
-// Type helper so TS knows the dict shape coming from getDictionary (still useful elsewhere)
 type Dict = Awaited<ReturnType<typeof getDictionary>>;
 
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { locale: Locale };
-}) {
-  const lang = params.locale;
+
+export default async function RootLayout(props: any) {
+  const { children, params } = props;
+
+  // In Next 15, params can be a Promise, so we safely await it
+  const resolved = await params;
+  const rawLocale = resolved?.locale ?? "en";
+
+  // Normalize to your union type
+  const lang = (rawLocale === "ar" ? "ar" : "en") as Locale;
   const dir = lang === "ar" ? "rtl" : "ltr";
 
-  // You can still fetch this for other pages/sections that need it
   const dict: Dict = await getDictionary(lang);
 
   return (
@@ -43,14 +43,26 @@ export default async function RootLayout({
       className={cairo.variable}
     >
       <body className="min-h-dvh flex flex-col bg-background text-foreground antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <ToastProvider position="top-right" timeout={5000} showCloseButton={true}>
-  <Header locale={lang} />
-  <main id="main" className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-    {children}
-  </main>
-  <FooterSection locale={lang} />
-</ToastProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ToastProvider
+            position="top-right"
+            timeout={5000}
+            showCloseButton={true}
+          >
+            <Header locale={lang} />
+            <main
+              id="main"
+              className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8"
+            >
+              {children}
+            </main>
+            <FooterSection locale={lang} />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

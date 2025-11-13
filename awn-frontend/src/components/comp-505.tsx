@@ -34,12 +34,17 @@ export default function Component() {
     { time: "17:30", available: true },
   ]
 
+  const isBefore = (d: Date, ref: Date) => {
+    const a = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    const b = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate())
+    return a.getTime() < b.getTime()
+  }
+
   return (
     <div>
       <div className="rounded-md border">
         <div className="flex max-sm:flex-col">
           <Calendar
-            mode="single"
             selected={date}
             onSelect={(newDate) => {
               if (newDate) {
@@ -47,10 +52,8 @@ export default function Component() {
                 setTime(null)
               }
             }}
-            className="p-2 sm:pe-5"
-            disabled={[
-              { before: today }, // Dates before today
-            ]}
+            // disable dates before today
+            disabled={(d: Date) => isBefore(d, today)}
           />
           <div className="relative w-full max-sm:h-48 sm:w-40">
             <div className="absolute inset-0 py-4 max-sm:border-t">

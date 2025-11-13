@@ -1,8 +1,6 @@
-"use client";
-
 import Login from "@/components/login";
 import type { Locale } from "@/lib/i18n";
-import { use } from "react";
+import { use, Suspense } from "react";
 
 export default function LoginPage({
   params,
@@ -17,7 +15,9 @@ export default function LoginPage({
         <h1 className="text-2xl font-bold mb-6 text-center">
           {locale === "ar" ? "تسجيل الدخول" : "Login"}
         </h1>
-        <Login locale={locale} />
+        <Suspense fallback={<div className="h-48 flex items-center justify-center">Loading...</div>}>
+          <Login locale={locale} />
+        </Suspense>
       </div>
     </div>
   );

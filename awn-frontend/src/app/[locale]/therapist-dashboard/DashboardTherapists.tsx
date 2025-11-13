@@ -24,7 +24,13 @@ import type { Appointment } from "@/lib/types";
 // Types and Component definition...
 type Props = { locale: Locale };
 // ✨ تم تحديث نوع TherapistAppointment و SessionNote
-type TherapistAppointment = Omit<Appointment, "therapistId"> & { patientName: string, patientNameEn: string };
+// Allow 'pending' status for therapist-side appointments (they can be pending approval)
+type TherapistAppointment = Omit<Appointment, "therapistId" | "status"> & {
+  patientName: string;
+  patientNameEn: string;
+  status: "upcoming" | "completed" | "cancelled" | "pending";
+  cancelReason?: string;
+};
 type AppointmentTab = "upcoming" | "past" | "pending";
 type SessionNote = { id: string; patientName: string; patientNameEn: string; appointmentDate: string; note: string };
 
