@@ -48,16 +48,16 @@ export default function ApptsClient({ locale }: Props) {
   // State for appointments - now with cancelled appointments
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([
     {
-      id: "apt_123",
-      therapistId: "ahmed-alotaibi",
+      id: "thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       date: "2025-11-15",
       time: "10:30",
       status: "upcoming",
       kind: "home",
     },
     {
-      id: "apt_124",
-      therapistId: "sarah-alshahri",
+      id: "alaa-ahmed",
+      therapistId: "alaa-ahmed",
       date: "2025-11-20",
       time: "14:00",
       kind: "online",
@@ -65,8 +65,8 @@ export default function ApptsClient({ locale }: Props) {
       meetLink: "https://meet.google.com/abc-def-ghi",
     },
     {
-      id: "apt_125",
-      therapistId: "ahmed-alotaibi",
+      id: "khaled-habib",
+      therapistId: "khaled-habib",
       date: "2025-11-25",
       time: "16:00",
       kind: "home",
@@ -76,24 +76,24 @@ export default function ApptsClient({ locale }: Props) {
 
   const [pastAppointments, setPastAppointments] = useState<Appointment[]>([
     {
-      id: "apt_past_1",
-      therapistId: "ahmed-alotaibi",
+      id: "abdullah-alshahrani",
+      therapistId: "abdullah-alshahrani",
       date: "2025-10-20",
       time: "15:00",
       status: "completed",
       kind: "home",
     },
     {
-      id: "apt_past_2",
-      therapistId: "sarah-alshahri",
+      id: "thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       date: "2025-10-15",
       time: "11:30",
       kind: "online",
       status: "completed",
     },
     {
-      id: "apt_past_3",
-      therapistId: "ahmed-alotaibi",
+      id: "alaa-ahmed",
+      therapistId: "alaa-ahmed",
       date: "2025-10-10",
       time: "09:00",
       kind: "home",

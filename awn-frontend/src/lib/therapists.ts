@@ -1,90 +1,179 @@
-// Updated therapist data with correct availability structure
+
 const therapists = [
-  {
-    id: "ahmed-alotaibi",
-    name: {
-      en: "Dr. Ahmed Al-Otaibi",
-      ar: "د. أحمد العتيبي"
-    },
-    specialties: ["Sports Physiotherapy", "العلاج الطبيعي الرياضي"],
-    image: "/Ahmed.png",
-    rating: 4.8,
-    experience: 8,
-    location: {
-      en: "Riyadh",
-      ar: "الرياض"
-    },
-    bio: {
-      en: "Specialized in sports injuries and rehabilitation",
-      ar: "متخصص في إصابات الرياضة والتأهيل"
-    },
-    price: 200,
-    currency: "SAR",
-    availability: {
-      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
-    },
-    languages: ["Arabic", "English"],
-    education: ["DPT - King Saud University", "MSc Sports Medicine"],
-    certifications: ["Licensed Physiotherapist", "Sports Injury Specialist"],
+ {
+  id: "thamer-alshahrani",
+  name: {
+    en: "Thamer Alshahrani",
+    ar: "ثامر الشهراني"
   },
-  {
-    id: "sarah-alshahri",
-    name: {
-      en: "Dr. Sarah Al-Shahri",
-      ar: "د. سارة الشهري"
-    },
-    specialties: ["Orthopedic Physiotherapy", "العلاج الطبيعي العظمي"],
-    image: "/Amani.png",
-    rating: 4.9,
-    experience: 12,
-    location: {
-      en: "Riyadh",
-      ar: "الرياض"
-    },
-    bio: {
-      en: "Expert in post-surgical rehabilitation and manual therapy",
-      ar: "خبيرة في التأهيل بعد العمليات والعلاج اليدوي"
-    },
-    price: 250,
-    currency: "SAR",
-    availability: {
-      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
-    },
-    languages: ["Arabic", "English"],
-    education: ["DPT - University of Toronto", "Fellowship in Manual Therapy"],
-    certifications: ["Licensed Physiotherapist", "Manual Therapy Specialist", "Orthopedic Clinical Specialist"],
+  specialties: ["Musculoskeletal Physiotherapy", "العلاج الطبيعي العضلي الهيكلي"],
+  image: "/thamir.png",
+  rating: 4.8,
+  experience: 5,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
   },
-  {
-    id: "faisal-almutairi",
-    name: {
-      en: "Dr. Faisal Al-Mutairi",
-      ar: "د. فيصل المطيري"
-    },
-    specialties: ["Neurological Physiotherapy", "العلاج الطبيعي العصبي"],
-    image: "/Faisal.png",
-    rating: 4.7,
-    experience: 10,
-    location: {
-      en: "Jeddah",
-      ar: "جدة"
-    },
-    bio: {
-      en: "Specialized in stroke recovery and neurological conditions",
-      ar: "متخصص في التعافي من السكتة الدماغية والحالات العصبية"
-    },
-    price: 220,
-    currency: "SAR",
-    availability: {
-      online: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"],
-      home: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"]
-    },
-    languages: ["Arabic", "English"],
-    education: ["DPT - King Abdulaziz University", "MSc Neurological Rehabilitation"],
-    certifications: ["Licensed Physiotherapist", "Neurological Clinical Specialist"],
+  bio: {
+    en: "Musculoskeletal physiotherapy and sports injuries.",
+    ar: "العلاج الطبيعي العضلي الهيكلي والإصابات الرياضية."
   },
-];
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: ["09:00", "10:00", "11:00", "14:00", "15:00"],
+    home: []
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+
+{
+  id: "khaled-habib",
+  name: {
+    en: "Khaled Habib",
+    ar: "خالد حبيب"
+  },
+  specialties: ["Orthopedic Physiotherapy", "العلاج الطبيعي العظمي"],
+  image: "/khalid.jpg",
+  rating: 4.8,
+  experience: 6,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
+  },
+  bio: {
+    en: "Muscle and skeletal disorders, advanced manual therapy.",
+    ar: "مشاكل العضلات، العظام، والعلاج اليدوي المتقدم."
+  },
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: [],
+    home: ["09:00", "11:00", "14:00", "15:00"]
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+
+ {
+  id: "ayman-alsaadi",
+  name: {
+    en: "Ayman Alsaadi",
+    ar: "أيمن الصاعدي"
+  },
+  specialties: ["General Physiotherapy", "العلاج الطبيعي العام"],
+  image: "/Ayman.jpg",
+  rating: 4.7,
+  experience: 4,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
+  },
+  bio: {
+    en: "General physical therapy and rehabilitation.",
+    ar: "إعادة التأهيل والعلاج الطبيعي العام."
+  },
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: [],
+    home: ["09:00", "10:00", "14:00"]
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+
+{
+  id: "abdullah-alshahrani",
+  name: {
+    en: "Abdullah Alshahrani",
+    ar: "عبدالله الشهراني"
+  },
+  specialties: ["Orthopedic", "Sports","إصابات العظام، الإصابات الرياضية، والعلاج اليدوي ."],
+  image: "/abdullah.jpg",
+  rating: 4.9,
+  experience: 5,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
+  },
+  bio: {
+    en: "Orthopedic injuries, sports injuries, and manual therapy.",
+    ar: "إصابات العظام، الإصابات الرياضية، والعلاج اليدوي."
+  },
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: ["09:00", "10:00", "11:00", "15:00"],
+    home: []
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+
+{
+  id: "nismah-alalshi",
+  name: {
+    en: "Nismah Alalshi",
+    ar: "نسمة العلشي"
+  },
+  specialties: ["Women Physiotherapy", "العلاج الطبيعي للنساء"],
+  image: "/Nismah.jpg",
+  rating: 4.9,
+  experience: 5,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
+  },
+  bio: {
+    en: "Women’s health & postpartum rehabilitation specialist.",
+    ar: "ضعف عضلات قاع الحوض وآلام ما بعد الولادة."
+  },
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: [],
+    home: ["09:00", "10:00", "14:00"]
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+
+{
+  id: "alaa-ahmed",
+  name: {
+    en: "Alaa Ahmed",
+    ar: "الاء أحمد"
+  },
+  specialties: ["Geriatrics", "العلاج الطبيعي للمسنين"],
+  image: "/Alaa.png",
+  rating: 4.8,
+  experience: 4,
+  location: {
+    en: "Riyadh",
+    ar: "الرياض"
+  },
+  bio: {
+    en: "Geriatric physical therapist.",
+    ar: "أخصائية علاج طبيعي للمسنين."
+  },
+  price: 200,
+  currency: "SAR",
+  availability: {
+    online: ["09:00", "10:00", "11:00", "15:00"],
+    home: []
+  },
+  languages: ["Arabic"],
+  education: ["Bachelor of Physiotherapy"],
+  certifications: ["SCFHS Licensed"],
+},
+];      
 
 export function getTherapistById(id: string) {
   return therapists.find(t => t.id === id) || null;

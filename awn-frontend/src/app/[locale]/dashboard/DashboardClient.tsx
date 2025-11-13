@@ -24,16 +24,16 @@ export default function DashboardClient({ locale }: Props) {
   // State for appointments - so we can update the list when cancelled
   const [appointments, setAppointments] = useState<Appointment[]>([
     {
-      id: "apt_123",
-      therapistId: "ahmed-alotaibi",
+      id:"thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       date: "2025-11-04",
       time: "10:30",
       kind: "home",
       status: "upcoming",
     },
     {
-      id: "apt_124", 
-      therapistId: "sarah-alshahri",
+      id: "alaa-ahmed", 
+      therapistId: "alaa-ahmed",
       date: "2025-11-06",
       time: "14:00",
       kind: "online",
@@ -53,16 +53,16 @@ export default function DashboardClient({ locale }: Props) {
   // Updated therapist notes with correct IDs
   const therapistNotes = [
     {
-      id: "note_1",
-      therapistId: "ahmed-alotaibi",
+      id:"thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       appointmentDate: "2025-10-20",
       note: ar 
         ? "المريض يظهر تحسناً جيداً في حركة الكتف. ننصح بمواصلة التمارين المنزلية وتجنب الحركات المفاجئة."
         : "Patient showing good improvement in shoulder mobility. Recommend continuing home exercises and avoiding sudden movements."
     },
     {
-      id: "note_2", 
-      therapistId: "sarah-alshahri",
+      id: "abdullah-alshahrani", 
+      therapistId: "abdullah-alshahrani",
       appointmentDate: "2025-10-15",
       note: ar
         ? "تم البدء في العلاج الطبيعي للكتف الأيمن. استجابة جيدة للعلاج والمريض متعاون."
@@ -197,22 +197,13 @@ export default function DashboardClient({ locale }: Props) {
 
       {/* Header - Mobile responsive */}
       <header className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            {ar ? `أهلاً ${userName}` : `Welcome ${userName}`}
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <GradientSlideButton 
-            onClick={handleNewAppointment}
-            className="transition-all duration-200 hover:scale-105 active:scale-95 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white shadow-lg hover:shadow-xl w-full sm:w-auto"
-          >
-            {ar ? "احجز موعد جديد" : "Book new appointment"}
-          </GradientSlideButton>
-        </div>
-      </header>
-
-      {/* Medical History Card */}
+  <div className="flex items-center gap-3">
+    <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+      {ar ? `أهلاً ${userName}` : `Welcome ${userName}`}
+    </h1>
+  </div>
+</header>
+{/* Medical History Card */}
       <Card className="mb-6 sm:mb-8 border-l-4 border-l-teal-500 bg-gradient-to-r from-teal-50 to-cyan-50">
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

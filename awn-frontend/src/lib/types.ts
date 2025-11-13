@@ -1,3 +1,4 @@
+// Therapist type
 export interface Therapist {
   id: string;
   name: string;
@@ -20,6 +21,7 @@ export interface Therapist {
   certifications: string[];
 }
 
+// Appointment type (for patients)
 export interface Appointment {
   id: string;
   therapistId: string;
@@ -27,17 +29,39 @@ export interface Appointment {
   time: string;
   kind: 'online' | 'home';
   status: 'upcoming' | 'completed' | 'cancelled';
+
   place?: string;
   meetLink?: string;
 }
 
+export type TherapistAppointment = {
+  id: string;
+  patientName: string;
+  patientNameEn: string;
+  date: string;
+  time: string;
+  kind: "online" | "Home" | "home";
+  status: "upcoming" | "completed" | "pending" | "completed";
+  place?: string;
+  meetLink?: string;
+  cancelReason?: string ;
+}
+
+// Treatment plan type
 export interface TreatmentPlan {
   id: string;
   therapistId: string;
   title: string;
   steps: string[];
   createdAt: string;
-  status: 'proposed' | 'pending' | 'accepted' | 'declined' | 'in-progress' | 'completed' | 'cancelled';
+  status:
+    | "proposed"
+    | "pending"
+    | "accepted"
+    | "declined"
+    | "in-progress"
+    | "completed"
+    | "cancelled";
   completedSteps?: number;
 }
 

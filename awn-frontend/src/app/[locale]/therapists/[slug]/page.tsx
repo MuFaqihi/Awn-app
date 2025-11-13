@@ -93,8 +93,8 @@ export default function TherapistPage({ params }: Props) {
 
   // State for saved therapists
   const [savedTherapists, setSavedTherapists] = useState<string[]>([
-    "ahmed-alotaibi", 
-    "sarah-alshahri"
+    "nismah-alalshi", 
+    "khalid-habib",
   ]); // Mock some saved therapists
 
   const toggleSaved = (therapistId: string) => {
@@ -670,73 +670,118 @@ export default function TherapistPage({ params }: Props) {
                   </div>
                 )}
 
-                {/* STEP 4: Payment */}
-                {step === 4 && (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-semibold">{isArabic ? "طريقة الدفع" : "Payment Method"}</h3>
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => setPaymentMethod("card")}
-                        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                          paymentMethod === "card" ? "border-primary bg-primary/5" : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{isArabic ? "بطاقة ائتمانية" : "Credit Card"}</div>
-                            <div className="text-sm text-gray-600">{isArabic ? "فيزا، ماستركارد، مدى" : "Visa, Mastercard, Mada"}</div>
-                          </div>
-                          <div className="text-2xl">💳</div>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setPaymentMethod("tabby")}
-                        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                          paymentMethod === "tabby" ? "border-primary bg-primary/5" : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{isArabic ? "تابي" : "Tabby"}</div>
-                            <div className="text-sm text-gray-600">{isArabic ? "ادفع على 4 دفعات بدون فوائد" : "Pay in 4 interest-free installments"}</div>
-                          </div>
-                          <div className="text-2xl">📱</div>
-                        </div>
-                      </button>
+             {/* STEP 4: Payment */}
+{step === 4 && (
+  <div className="space-y-6">
+    <h3 className="text-lg font-semibold">
+      {isArabic ? "طريقة الدفع" : "Payment Method"}
+    </h3>
 
-                      <button
-                        onClick={() => setPaymentMethod("tamara")}
-                        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                          paymentMethod === "tamara" ? "border-primary bg-primary/5" : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{isArabic ? "تمارا" : "Tamara"}</div>
-                            <div className="text-sm text-gray-600">{isArabic ? "قسّط فاتورتك بدون فوائد" : "Split your bill with no interest"}</div>
-                          </div>
-                          <div className="text-2xl">💰</div>
-                        </div>
-                      </button>
-                      
-                      <button
-                        onClick={() => setPaymentMethod("apple")}
-                        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                          paymentMethod === "apple" ? "border-primary bg-primary/5" : "border-gray-200 hover:border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{isArabic ? "آبل باي" : "Apple Pay"}</div>
-                            <div className="text-sm text-gray-600">{isArabic ? "ادفع بأمان باستخدام Touch ID" : "Pay securely with Touch ID"}</div>
-                          </div>
-                          <div className="text-2xl">🍎</div>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
+    <div className="space-y-3">
+      {/* Credit Card */}
+      <button
+        onClick={() => setPaymentMethod("card")}
+        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+          paymentMethod === "card"
+            ? "border-primary bg-primary/5"
+            : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">
+              {isArabic ? "بطاقة ائتمانية" : "Credit Card"}
+            </div>
+            <div className="text-sm text-gray-600">
+              {isArabic ? "فيزا، ماستركارد، مدى" : "Visa, Mastercard, Mada"}
+            </div>
+          </div>
+
+          <img
+            src="/cards.png"
+            alt="Card"
+            className="w-10 h-10 opacity-80"
+          />
+        </div>
+      </button>
+
+      {/* Tabby */}
+      <button
+        onClick={() => setPaymentMethod("tabby")}
+        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+          paymentMethod === "tabby"
+            ? "border-primary bg-primary/5"
+            : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">{isArabic ? "تابي" : "Tabby"}</div>
+            <div className="text-sm text-gray-600">
+              {isArabic ? "ادفع على 4 دفعات بدون فوائد" : "Pay in 4 interest-free installments"}
+            </div>
+          </div>
+
+          <img
+            src="/tappy.png"
+            alt="Tabby"
+            className="w-10 h-10 opacity-80"
+          />
+        </div>
+      </button>
+
+      {/* Tamara */}
+      <button
+        onClick={() => setPaymentMethod("tamara")}
+        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+          paymentMethod === "tamara"
+            ? "border-primary bg-primary/5"
+            : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">{isArabic ? "تمارا" : "Tamara"}</div>
+            <div className="text-sm text-gray-600">
+              {isArabic ? "قسّط فاتورتك بدون فوائد" : "Split your bill with no interest"}
+            </div>
+          </div>
+
+          <img
+            src="/tamara.jpeg"
+            alt="Tamara"
+            className="w-10 h-10 opacity-80"
+          />
+        </div>
+      </button>
+
+      {/* Apple Pay */}
+      <button
+        onClick={() => setPaymentMethod("apple")}
+        className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+          paymentMethod === "apple"
+            ? "border-primary bg-primary/5"
+            : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium">{isArabic ? "آبل باي" : "Apple Pay"}</div>
+            <div className="text-sm text-gray-600">
+              {isArabic ? "ادفع بأمان باستخدام Touch ID" : "Pay securely with Touch ID"}
+            </div>
+          </div>
+
+          <img
+            src="/applepay.png"
+            alt="Apple Pay"
+            className="w-10 h-10 opacity-80"
+          />
+        </div>
+      </button>
+    </div>
+  </div>
+)}
 
                 {/* STEP 5: Confirmation */}
                 {step === 5 && (

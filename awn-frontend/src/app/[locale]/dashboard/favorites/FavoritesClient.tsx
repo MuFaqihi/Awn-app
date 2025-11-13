@@ -11,6 +11,7 @@ import { Bookmark, BookmarkCheck, MapPin, Star, Calendar, Award, Globe, Sparkles
 import { useMedicalHistoryStatus, getMedicalHistoryLabels } from '@/hooks/use-medical-history-status';
 import Link from "next/link";
 import Image from "next/image";
+import { Therapist } from "@/lib/types";
 
 interface FavoritesClientProps {
   locale: Locale;
@@ -25,8 +26,10 @@ export default function FavoritesClient({ locale }: FavoritesClientProps) {
   
   // State to manage saved therapists
   const [savedTherapists, setSavedTherapists] = React.useState<string[]>([
-    "ahmed-alotaibi", 
-    "sarah-alshahri"
+    "Thamer-alshahrani",
+    "Alaa-Ahmed",
+
+
   ]); // Mock some saved therapists
 
   const favoriteTherapists = therapists.filter(t => savedTherapists.includes(t.id));
