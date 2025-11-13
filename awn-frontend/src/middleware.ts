@@ -10,7 +10,6 @@ export function middleware(req: NextRequest) {
   const isPublic =
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.startsWith("/favicon") ||
     pathname.includes(".");
 
   if (isPublic) {
