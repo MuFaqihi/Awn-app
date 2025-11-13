@@ -1,3 +1,4 @@
+// Full backend route file implementing register, login, verify-otp, resend-otp
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -5,10 +6,14 @@ const { createClient } = require('@supabase/supabase-js');
 const { generateToken, verifyToken } = require('../utils/jwt');
 const { sendOtpEmail } = require('../utils/sendEmail');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.warn('Supabase URL or Key missing. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY).');
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // helper: generate 6-digit OTP
 function createOtp() {
@@ -22,20 +27,12 @@ function otpExpiryDate() {
 
 /**
  * POST /api/auth/patient/register
- * إنشاء حساب مريض جديد + إرسال OTP
+ * create patient + send OTP
  */
 router.post('/register', async (req, res) => {
   try {
-    const {
-      first_name,
-      last_name,
-      email,
-      password,
-    } = req.body;
-
-    console.log('محاولة تسجيل مريض جديد:', email);
-
-    if (!first_name⠞⠵⠟⠵⠞⠟⠞⠞⠟⠵⠞⠟⠞⠺!email || !password) {
+    let { first_name, last_name, email, password } = req.body;
+    if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
         error: 'بيانات ناقصة',
@@ -43,31 +40,33 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // هل البريد مستخدم بالفعل؟
-    const { data: existingPatient } = await supabase
+    email = (email || '').toLowerCase();
+
+    // check existing
+    const { data: existingPatient, error: existingError } = await supabase
       .from('patients')
       .select('id')
-      .eq('email', email.toLowerCase())
+      .eq('email', email)
       .maybeSingle();
 
-    if (existingPatient) {
-      return res.status(409).json({
-        success: false,
-        error: 'البريد الإلكتروني مسجل مسبقاً'
-      });
+    if (existingError) {
+      console.error('Supabase error checking existing patient:', existingError);
+      return res.status(500).json({ success: false, error: 'Database error' });
     }
 
-    // هاش كلمة المرور
+    if (existingPatient) {
+      return res.status(409).json({ success: false, error: 'البريد الإلكتروني مسجل مسبقاً' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // إنشاء المريض
     const { data: patient, error: insertError } = await supabase
       .from('patients')
       .insert([
         {
           first_name,
           last_name,
-          email: email.toLowerCase(),
+          email,
           password_hash: hashedPassword,
           login_attempts: 0,
           account_locked: false,
@@ -88,7 +87,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // إنشاء وحفظ OTP
+    // create + store OTP
     const otpCode = createOtp();
     const expiresAt = otpExpiryDate();
 
@@ -102,39 +101,27 @@ router.post('/register', async (req, res) => {
 
     if (otpError) {
       console.error('خطأ في حفظ OTP:', otpError);
-      return res.status(500).json({
-        success: false,
-        error: 'فشل في إعداد رمز التحقق'
-      });
+      return res.status(500).json({ success: false, error: 'فشل في إعداد رمز التحقق' });
     }
 
-    // إرسال OTP بالبريد (Resend)
-    const emailSent = await sendOtpEmail(patient.email, otpCode);
-    if (!emailSent) {
-      // تقنياً الحساب مخلوق، لكن فشل الإرسال
-      console.warn('تم إنشاء الحساب لكن فشل إرسال البريد للـ OTP');
+    // send OTP by email (best-effort)
+    try {
+      await sendOtpEmail(patient.email, otpCode);
+    } catch (e) {
+      console.warn('Failed sending OTP email:', e);
     }
 
-    // token مؤقت لاستخدامه في /verify-otp
+    // temporary token used for verify route
     const tempToken = generateToken(
-      {
-        patientId: patient.id,
-        email: patient.email,
-        type: 'patient',
-        verified: false,
-        context: 'register'
-      },
+      { patientId: patient.id, email: patient.email, type: 'patient', verified: false, context: 'register' },
       '15m'
     );
-
-    console.log('تم تسجيل المريض بنجاح:', patient.id);
 
     return res.status(201).json({
       success: true,
       message: 'تم إرسال رمز التحقق إلى بريدك الإلكتروني',
       tempToken,
       email: patient.email,
-      // otp: otpCode // ⚠️ فقط للتطوير/اللوكال، احذفها في الإنتاج
     });
   } catch (error) {
     console.error('خطأ في تسجيل المريض:', error);
@@ -148,40 +135,29 @@ router.post('/register', async (req, res) => {
 
 /**
  * POST /api/auth/patient/login
- * تسجيل دخول + إرسال OTP
+ * verify credentials, create OTP and tempToken
  */
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    console.log('محاولة تسجيل دخول مريض:', email);
+    const { email: rawEmail, password } = req.body;
+    const email = (rawEmail || '').toLowerCase();
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور'
-      });
+      return res.status(400).json({ success: false, error: 'يرجى إدخال البريد الإلكتروني وكلمة المرور' });
     }
 
     const { data: patient, error: fetchError } = await supabase
       .from('patients')
       .select('*')
-      .eq('email', email.toLowerCase())
+      .eq('email', email)
       .single();
 
     if (fetchError || !patient) {
-      return res.status(401).json({
-        success: false,
-        error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-      });
+      return res.status(401).json({ success: false, error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
     }
 
     if (patient.account_locked) {
-      return res.status(423).json({
-        success: false,
-        error: 'الحساب مغلق مؤقتاً',
-        details: 'يرجى التواصل مع الدعم الفني'
-      });
+      return res.status(423).json({ success: false, error: 'الحساب مغلق مؤقتاً', details: 'يرجى التواصل مع الدعم الفني' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, patient.password_hash);
@@ -191,10 +167,7 @@ error: 'يرجى إدخال البريد الإلكتروني وكلمة الم�
 
       await supabase
         .from('patients')
-        .update({
-          login_attempts: newAttempts,
-          account_locked: shouldLockAccount
-        })
+        .update({ login_attempts: newAttempts, account_locked: shouldLockAccount })
         .eq('id', patient.id);
 
       return res.status(401).json({
@@ -205,7 +178,7 @@ error: 'يرجى إدخال البريد الإلكتروني وكلمة الم�
       });
     }
 
-    // كلمة المرور صحيحة → إنشاء OTP جديد
+    // create OTP and save
     const otpCode = createOtp();
     const expiresAt = otpExpiryDate();
 
@@ -221,56 +194,36 @@ error: 'يرجى إدخال البريد الإلكتروني وكلمة الم�
 
     if (otpError) {
       console.error('خطأ في إعداد OTP:', otpError);
-      return res.status(500).json({
-        success: false,
-        error: 'فشل في إعداد رمز التحقق'
-      });
+      return res.status(500).json({ success: false, error: 'فشل في إعداد رمز التحقق' });
     }
 
-    // إرسال OTP بالبريد
-    const emailSent = await sendOtpEmail(patient.email, otpCode);
-    if (!emailSent) {
-      console.warn('فشل إرسال البريد الإلكتروني للـ OTP للمريض:', patient.id);
-      // ممكن ترجع 500 أو تستمر حسب قرارك
+    try {
+      await sendOtpEmail(patient.email, otpCode);
+    } catch (e) {
+      console.warn('Failed sending OTP email:', e);
     }
 
-    // token مؤقت لخطوة التحقق من OTP
     const tempToken = generateToken(
-      {
-        patientId: patient.id,
-        email: patient.email,
-        type: 'patient',
-        verified: false,
-        context: 'login'
-      },
+      { patientId: patient.id, email: patient.email, type: 'patient', verified: false, context: 'login' },
       '15m'
     );
-
-    console.log('تم إرسال رمز التحقق للمريض:', patient.id);
 
     return res.json({
       success: true,
       message: 'تم إرسال رمز التحقق إلى بريدك الإلكتروني',
       tempToken,
       email: patient.email,
-      // otp: otpCode // ⚠️ فقط للتطوير لو حابة تشوفيه بالـ Network
     });
   } catch (error) {
     console.error('خطأ في تسجيل الدخول:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'فشل في تسجيل الدخول'
-    });
+    return res.status(500).json({ success: false, error: 'فشل في تسجيل الدخول' });
   }
 });
 
 /**
  * POST /api/auth/patient/verify-otp
- * التحقق من OTP (بعد register أو login) + إصدار access token نهائي
- *
- * Expected:
- *  Header: Authorization: Bearer <tempToken>
- *  Body: { otp: "123456" }
+ * Body: { otp: "123456" }
+ * Header: Authorization: Bearer <tempToken>
  */
 router.post('/verify-otp', async (req, res) => {
   try {
@@ -278,27 +231,18 @@ router.post('/verify-otp', async (req, res) => {
     const authHeader = req.headers.authorization || '';
 
     if (!otp) {
-      return res.status(400).json({
-        success: false,
-        error: 'يرجى إدخال رمز التحقق'
-      });
+      return res.status(400).json({ success: false, error: 'يرجى إدخال رمز التحقق' });
     }
 
     if (!authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        error: 'رمز مؤقت مفقود أو غير صالح'
-      });
+      return res.status(401).json({ success: false, error: 'رمز مؤقت مفقود أو غير صالح' });
     }
 
     const tempToken = authHeader.replace('Bearer ', '').trim();
     const decoded = verifyToken(tempToken);
 
     if (!decoded || !decoded.patientId) {
-      return res.status(401).json({
-        success: false,
-        error: 'رمز مؤقت غير صالح أو منتهي الصلاحية'
-      });
+      return res.status(401).json({ success: false, error: 'رمز مؤقت غير صالح أو منتهي الصلاحية' });
     }
 
     const patientId = decoded.patientId;
@@ -310,64 +254,50 @@ router.post('/verify-otp', async (req, res) => {
       .single();
 
     if (fetchError || !patient) {
-      return res.status(404).json({
-        success: false,
-        error: 'الحساب غير موجود'
-      });
+      return res.status(404).json({ success: false, error: 'الحساب غير موجود' });
     }
 
-    // التحقق من OTP
     if (!patient.otp_code || !patient.otp_expires_at) {
-      return res.status(400).json({
-        success: false,
-        error: 'لا يوجد رمز تحقق نشط، يرجى إعادة الإرسال'
-      });
+      return res.status(400).json({ success: false, error: 'لا يوجد رمز تحقق نشط، يرجى إعادة الإرسال' });
     }
 
     const now = new Date();
     const expiresAt = new Date(patient.otp_expires_at);
 
     if (now > expiresAt) {
-      return res.status(400).json({
-        success: false,
-        error: 'انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد'
-      });
+      return res.status(400).json({ success: false, error: 'انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد' });
     }
 
     if (patient.otp_code !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: 'رمز التحقق غير صحيح'
-      });
+      return res.status(400).json({ success: false, error: 'رمز التحقق غير صحيح' });
     }
 
-    // OTP صحيح → تحديث حالة المريض
+    // OTP correct: update state. Only set email_verified for register flow.
+    const shouldVerifyEmail = decoded.context === 'register';
+
+    const updatePayload = {
+      otp_code: null,
+      otp_expires_at: null,
+      updated_at: new Date()
+    };
+
+    if (shouldVerifyEmail && !patient.email_verified) {
+      updatePayload.email_verified = true;
+    }
+
     const { error: updateError } = await supabase
       .from('patients')
-      .update({
-        email_verified: true,
-        otp_code: null,
-        otp_expires_at: null,
-        updated_at: new Date()
-      })
+      .update(updatePayload)
       .eq('id', patient.id);
 
     if (updateError) {
       console.error('خطأ في تحديث حالة المريض بعد التحقق من OTP:', updateError);
-      return res.status(500).json({
-        success: false,
-        error: 'فشل في تحديث حالة الحساب بعد التحقق'
-      });
+      return res.status(500).json({ success: false, error: 'فشل في تحديث حالة الحساب بعد التحقق' });
     }
 
-    // إصدار access token نهائي
+    // final access token for client (7d)
     const accessToken = generateToken(
-      {
-        patientId: patient.id,
-        email: patient.email,
-        type: 'patient',
-        verified: true
-      },
+      { patientId: patient.id, email: patient.email, type: 'patient', verified: patient.email_verified || shouldVerifyEmail },
       '7d'
     );
 
@@ -380,15 +310,74 @@ router.post('/verify-otp', async (req, res) => {
         first_name: patient.first_name,
         last_name: patient.last_name,
         email: patient.email,
-        email_verified: true
+        email_verified: patient.email_verified || shouldVerifyEmail
       }
     });
   } catch (error) {
     console.error('خطأ في التحقق من OTP:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'فشل في التحقق من الرمز'
-    });
+    return res.status(500).json({ success: false, error: 'فشل في التحقق من الرمز' });
+  }
+});
+
+/**
+ * POST /api/auth/patient/resend-otp
+ * Resend current/new OTP. Requires tempToken in Authorization.
+ * (Use to throttle/resend OTP)
+ */
+router.post('/resend-otp', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'رمز مؤقت مفقود أو غير صالح' });
+    }
+
+    const tempToken = authHeader.replace('Bearer ', '').trim();
+    const decoded = verifyToken(tempToken);
+
+    if (!decoded || !decoded.patientId) {
+      return res.status(401).json({ success: false, error: 'رمز مؤقت غير صالح أو منتهي الصلاحية' });
+    }
+
+    const patientId = decoded.patientId;
+
+    // generate new OTP
+    const otpCode = createOtp();
+    const expiresAt = otpExpiryDate();
+
+    const { data: patient, error: fetchError } = await supabase
+      .from('patients')
+      .select('*')
+      .eq('id', patientId)
+      .single();
+
+    if (fetchError || !patient) {
+      return res.status(404).json({ success: false, error: 'الحساب غير موجود' });
+    }
+
+    const { error: updateError } = await supabase
+      .from('patients')
+      .update({
+        otp_code: otpCode,
+        otp_expires_at: expiresAt,
+        updated_at: new Date()
+      })
+      .eq('id', patientId);
+
+    if (updateError) {
+      console.error('خطأ في حفظ OTP عند إعادة الإرسال:', updateError);
+      return res.status(500).json({ success: false, error: 'فشل في إعداد رمز التحقق' });
+    }
+
+    try {
+      await sendOtpEmail(patient.email, otpCode);
+    } catch (e) {
+      console.warn('Failed sending OTP email:', e);
+    }
+
+    return res.json({ success: true, message: 'تم إعادة إرسال رمز التحقق' });
+  } catch (error) {
+    console.error('خطأ في إعادة إرسال OTP:', error);
+    return res.status(500).json({ success: false, error: 'فشل في إعادة إرسال رمز التحقق' });
   }
 });
 
