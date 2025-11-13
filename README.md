@@ -58,7 +58,7 @@ It connects **patients and physiotherapists** for appointments and educational r
 * **Frontend:** React.js + Next.js  
 * **Backend:** Node.js + Express  
 * **Database & Auth:** Supabase (PostgreSQL)  
-* **Language:** HTML, CSS, JavaScript, and SQL
+* **Language:** HTML, CSS, JavaScript, TypeScript and SQL
 
 
 ---
