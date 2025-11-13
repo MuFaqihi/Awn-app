@@ -69,7 +69,7 @@ export default function ContentSection({ locale = 'ar' }: { locale?: Locale }) {
     : {
         title: 'A trusted way to access the right physiotherapy',
         subtitle:
-          'Awn helps you discover licensed therapists, book at a time that suits you, and see session details upfront — at clinics, home visits, or online.',
+          'Awn helps you discover licensed therapists, book at a time that suits you, and see session details upfront — at home visits, or online.',
         ctas: { primary: 'Browse Therapists', secondary: 'Contact Us' },
         cards: [
           {
