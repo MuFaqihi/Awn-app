@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronDown, Search, MessageCircle } from 'lucide-react';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -176,8 +177,8 @@ export default function FAQs({ locale = 'ar' }: { locale?: Locale }) {
             <MessageCircle className="h-5 w-5 text-blue-600" />
             <p className="text-gray-600">{t.contactNote}</p>
           </div>
-          <Button variant="outline" className="hover:bg-blue-50">
-            {locale === 'ar' ? 'تواصل معنا' : 'Contact Us'}
+          <Button asChild variant="outline" className="hover:bg-blue-50">
+            <Link href={`/${locale}/contact`}>{locale === 'ar' ? 'تواصل معنا' : 'Contact Us'}</Link>
           </Button>
         </div>
       </div>

@@ -97,6 +97,11 @@ export default function TherapistPage({ params }: Props) {
     "khalid-habib",
   ]); // Mock some saved therapists
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const toggleSaved = (therapistId: string) => {
     setSavedTherapists(prev => 
       prev.includes(therapistId) 
@@ -276,8 +281,8 @@ export default function TherapistPage({ params }: Props) {
                   <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                     <Calendar className="w-4 h-4" />
                     <span className="text-sm font-medium">
-                      {isArabic ? "متاح " : "Available "} 
-                      {new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB")}
+                      {isArabic ? "متاح " : "Available "}
+                      {mounted ? new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB") : ''}
                     </span>
                   </div>
                 </div>
@@ -690,7 +695,7 @@ export default function TherapistPage({ params }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <div className="font-medium">
-              {isArabic ? "بطاقة ائتمانية" : "Credit Card"}
+              {isArabic ? "بطاقة ائتمان" : "Credit Card"}
             </div>
             <div className="text-sm text-gray-600">
               {isArabic ? "فيزا، ماستركارد، مدى" : "Visa, Mastercard, Mada"}
@@ -768,7 +773,7 @@ export default function TherapistPage({ params }: Props) {
           <div>
             <div className="font-medium">{isArabic ? "آبل باي" : "Apple Pay"}</div>
             <div className="text-sm text-gray-600">
-              {isArabic ? "ادفع بأمان باستخدام Touch ID" : "Pay securely with Touch ID"}
+              {isArabic ? "ادفع بأمان عبر Apple Pay" : "Pay securely with Touch ID"}
             </div>
           </div>
 
@@ -793,9 +798,7 @@ export default function TherapistPage({ params }: Props) {
                       <h3 className="text-xl font-semibold text-green-600 mb-2">
                         {isArabic ? "تم تأكيد حجزك!" : "Booking Confirmed!"}
                       </h3>
-                      <p className="text-gray-600">
-                        {isArabic ? "رقم الحجز:" : "Booking ID:"} <span className="font-mono font-bold">{bookingId}</span>
-                      </p>
+                     
                     </div>
                     <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 text-sm">
                       <p className="mb-2">{isArabic ? "سنرسل لك رسالة تأكيد قريباً" : "We'll send you a confirmation message shortly"}</p>

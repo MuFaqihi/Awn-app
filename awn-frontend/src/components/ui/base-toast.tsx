@@ -74,21 +74,25 @@ const toastTypeVariants = cva('rounded-lg shadow-lg border', {
   },
 });
 
-const toastContainerVariants = cva(['fixed flex flex-col gap-2 z-50'], {
-  variants: {
-    position: {
-      'top-center': 'top-6 left-1/2 -translate-x-1/2',
-      'top-right': 'top-6 right-6',
-      'top-left': 'top-6 left-6',
-      'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2',
-      'bottom-right': 'bottom-6 right-6',
-      'bottom-left': 'bottom-6 left-6',
+const toastContainerVariants = cva(
+  ['fixed flex flex-col gap-2 z-50 pointer-events-none'],
+  {
+    variants: {
+      position: {
+        'top-center': 'top-6 left-1/2 -translate-x-1/2 items-center px-4',
+        // keep right offset on larger screens, use 0 + padding on small screens so toast stays visible
+        'top-right': 'top-6 right-0 sm:right-6 items-end pr-4 sm:pr-0',
+        'top-left': 'top-6 left-0 sm:left-6 items-start pl-4 sm:pl-0',
+        'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2 items-center px-4',
+        'bottom-right': 'bottom-6 right-0 sm:right-6 items-end pr-4 sm:pr-0',
+        'bottom-left': 'bottom-6 left-0 sm:left-6 items-start pl-4 sm:pl-0',
+      },
+    },
+    defaultVariants: {
+      position: 'top-right',
     },
   },
-  defaultVariants: {
-    position: 'top-right',
-  },
-});
+);
 
 const TOAST_ICONS: {
   [key: string]: React.ReactNode;

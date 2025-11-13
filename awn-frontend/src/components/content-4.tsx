@@ -211,10 +211,10 @@ export default function ContentSection({ locale = 'ar' }: { locale?: Locale }) {
             </ul>
             <div className="mt-5">
               <Button asChild className="bg-[#7ba5ab] hover:bg-[#119f90]">
-                <Link href={`${base}/signup?role=therapist`}>
-                  {isAr ? 'انضم كمختص' : 'Join as Therapist'}
-                </Link>
-              </Button>
+                  <Link href={`${base}/job-listing`}>
+                    {isAr ? 'انضم كمختص' : 'Join as Therapist'}
+                  </Link>
+                </Button>
             </div>
           </Card>
         </div>

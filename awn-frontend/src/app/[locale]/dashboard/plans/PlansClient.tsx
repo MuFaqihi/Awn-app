@@ -18,6 +18,11 @@ export default function PlansClient({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
   const [activeFilter, setActiveFilter] = useState<'all' | 'proposed' | 'active' | 'completed'>('all');
   const [expandedSessions, setExpandedSessions] = React.useState<Record<string, boolean>>({});
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Medical History integration
   const medicalHistory = useMedicalHistoryStatus();
@@ -55,7 +60,7 @@ export default function PlansClient({ locale }: { locale: Locale }) {
     },
     {
       id: "alaa-ahmed",
-      therapistId: "faisal-almutairi",
+      therapistId: "alaa-ahmed",
       title: ar ? "خطة علاج الظهر" : "Back Pain Treatment Plan",
       steps: [
         ar ? "جلسة تقييم أولي للعمود الفقري" : "Initial spine assessment session",
@@ -431,7 +436,10 @@ export default function PlansClient({ locale }: { locale: Locale }) {
             <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded-lg">
               <div className="text-xs text-green-700">
                 <Shield className="h-3 w-3 inline mr-1" />
-                {ar ? "آخر مراجعة طبية:" : "Last medical review:"} {new Date(medicalHistory.lastUpdated!).toLocaleDateString(ar ? 'ar-SA' : 'en-US')}
+                {ar ? "آخر مراجعة طبية:" : "Last medical review:"}
+                {mounted && medicalHistory.lastUpdated ? (
+                  <span> {new Date(medicalHistory.lastUpdated).toLocaleDateString(ar ? 'ar-SA' : 'en-US')}</span>
+                ) : null}
               </div>
             </div>
           )}
@@ -479,6 +487,7 @@ export default function PlansClient({ locale }: { locale: Locale }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 
 
+                <div className="sm:col-span-2">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -542,7 +551,8 @@ export default function PlansClient({ locale }: { locale: Locale }) {
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
-                </AlertDialog>
+        </AlertDialog>
+        </div>
                       </div>
               ) : null}
 

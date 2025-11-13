@@ -12,7 +12,7 @@ export type Locale = 'ar' | 'en';
 const NAV_AR = [
   { name: 'الرئيسية', path: '' },
   { name: 'المختصّين', path: 'therapists' },
-  { name: 'انضم كمختص', path: '/job-listing' },
+  { name: 'انضم كمختص', path: 'job-listing' },
   { name: 'تواصل', path: 'contact' },
   { name: 'الأسئلة الشائعة', path: 'faq' },
 ];
@@ -20,7 +20,7 @@ const NAV_AR = [
 const NAV_EN = [
   { name: 'Home', path: '' },
   { name: 'Therapists', path: 'therapists' },
-  { name: 'Join as Therapist', path: '/job-listing' },
+  { name: 'Join as Therapist', path: 'job-listing' },
   { name: 'Contact', path: 'contact' },
   { name: 'FAQ', path: 'faq' },
 ];

@@ -27,7 +27,7 @@ export default function JobListingPage({
     department: "شبكة الرعاية",
     posted: "نُشر منذ 3 أيام",
     shareJob: "مشاركة الوظيفة",
-    aboutTitle: "عن عَون",
+    aboutTitle: "عن عون",
     about: "نحن منصة رقمية تهدف لجعل العلاج الطبيعي متاحًا للجميع في المملكة. نؤمن بالثقة والأمان في الرعاية الصحية، ونسعى لتحقيق أفضل النتائج للمرضى من خلال شبكة أخصائيين مرخصين ومعتمدين.",
     jobDescTitle: "وصف الوظيفة",
     responsibilities: [

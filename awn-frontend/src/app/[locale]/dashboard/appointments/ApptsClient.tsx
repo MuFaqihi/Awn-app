@@ -11,6 +11,7 @@ import { GradientSlideButton } from "@/components/ui/gradient-slide-button";
 import { RescheduleDialog } from "@/components/RescheduleDialog";
 import { Rating } from "@/components/ui/rating";
 import { getTherapistById } from "@/lib/therapists";
+import { therapists as dataTherapists } from '@/data/therapists';
 import type { Appointment } from "@/lib/types";
 import { CalendarDays, Clock, MapPin, Star, Video, Home, Filter, Lightbulb, Calendar, Users, MessageSquare, X } from "lucide-react";
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -197,7 +198,12 @@ export default function ApptsClient({ locale }: Props) {
       return;
     }
     // Redirect to therapist's profile page
-    window.location.href = `/${locale}/therapists/${appointment.therapistId}`;
+    // Start booking flow on therapist profile (match FavoritesClient behavior)
+    // The profile page sources therapists from `src/data/therapists` which may have different id casing.
+    // Try to find the canonical id there (case-insensitive match) and use it if found.
+    const matched = dataTherapists.find(t => t.id === appointment.therapistId) || dataTherapists.find(t => t.id.toLowerCase() === appointment.therapistId.toLowerCase());
+    const profileId = matched ? matched.id : appointment.therapistId;
+    window.location.href = `/${locale}/therapists/${profileId}?book=true`;
   };
 
   const formatDate = (dateString: string) => {

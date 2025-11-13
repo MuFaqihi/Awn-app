@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, use } from "react"
+import { useState, useMemo, use, useEffect } from "react"
 import { Search, Filter, Star, MapPin, Clock, Shield, Award, Globe, Users, ChevronDown, Calendar, Heart, Video, Home } from "lucide-react"
 import { Button } from "@/components/ui/base-button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +32,11 @@ export default function TherapistsPage({ params }: Props) {
   })
   const [sortBy, setSortBy] = useState("recommended")
   const [showFilters, setShowFilters] = useState(false)
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Filter logic with updated data structure
   const filteredTherapists = useMemo(() => {
@@ -280,7 +285,8 @@ export default function TherapistsPage({ params }: Props) {
                 <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
                   <Calendar className="w-4 h-4 text-green-600" />
                   <span className="text-sm text-green-700">
-                    {isArabic ? "متاح" : "Available"} {new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB")}
+                    {isArabic ? "متاح" : "Available"}{' '}
+                    {mounted ? new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB") : ''}
                   </span>
                 </div>
 
