@@ -1,70 +1,88 @@
 const express = require('express');
 const router = express.Router();
-const { createClient } = require('@supabase/supabase-js');
+const supabase = require('../utils/supabase');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
-
-// GET /api/specialists - قائمة المختصين (للعرض العام)
+// GET /api/therapists
 router.get('/', async (req, res) => {
   try {
-    const { verified = true, specialization, page = 1, limit = 12 } = req.query;
+    console.log(' جلب المعالجين من قاعدة البيانات...');
 
-    const from = (page - 1) * limit;
-    const to = from + limit - 1;
-
-    let query = supabase
+    const { data: therapists, error } = await supabase
       .from('therapists')
-      .select('*', { count: 'exact' })
-      .eq('is_verified', verified)
+      .select('*')
       .eq('is_active', true)
-      .order('rating', { ascending: false });
+      .order('name_en');
 
-    if (specialization) {
-      query = query.ilike('specialization', `%${specialization}%`);
+    if (error) {
+      console.error('خطأ في جلب المعالجين:', error);
+      return res.status(500).json({ 
+        success: false,
+        error: error.message 
+      });
     }
 
-    const { data: specialists, error, count } = await query.range(from, to);
+    // تحويل البيانات لتتوافق مع هيكل الفرونت إند
+// في routes/therapists.js - استبدل جزء formattedTherapists بهذا:
+const formattedTherapists = therapists.map(therapist => ({
+  id: therapist.id,
+  name: {
+    en: therapist.name_en || "Therapist",
+    ar: therapist.name_ar || "معالج"
+  },
+  image: therapist.avatar_url || "/avatar-placeholder.jpg",
+  specialties: {
+    en: therapist.specialization ? 
+      therapist.specialization.split(',').map(s => s.trim()).filter(s => s) : 
+      ['Physical Therapy'],
+    ar: therapist.specialization ? 
+      therapist.specialization.split(',').map(s => s.trim()).filter(s => s) : 
+      ['العلاج الطبيعي']
+  },
+  experience: therapist.years_experience || 5,
+  languages: {
+    en: (therapist.languages || ['arabic', 'english']).map(lang => 
+      lang === 'arabic' ? 'Arabic' : 
+      lang === 'english' ? 'English' : lang
+    ),
+    ar: (therapist.languages || ['arabic', 'english']).map(lang => 
+      lang === 'arabic' ? 'العربية' : 
+      lang === 'english' ? 'الإنجليزية' : lang
+    )
+  },
+  city: therapist.city || "Riyadh",
+  basePrice: therapist.base_price || therapist.hourly_rate || 150,
+  credentials: {
+    scfhsVerified: therapist.is_verified || false,
+    yearsExperience: therapist.years_experience || 5
+  },
+  modes: therapist.session_type_ar ? 
+    (therapist.session_type_ar.includes('أونلاين') ? ['online'] : 
+     therapist.session_type_ar.includes('منزلية') ? ['home'] : 
+     ['online', 'home']) : 
+    ['online', 'home'],
+  nextAvailable: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  gender: therapist.gender || (therapist.name_ar && therapist.name_ar.includes('ة') ? 'female' : 'male'),
+  bio: {
+    en: therapist.bio_en || "Qualified physical therapy specialist",
+    ar: therapist.bio_ar || "أخصائي علاج طبيعي مؤهل"
+  },
+  rating: therapist.rating || 4.5
+}));
 
-    if (error) throw error;
-
+    console.log(` تم جلب ${formattedTherapists.length} معالج بنجاح`);
+    
     res.json({
-      specialists,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: count,
-        total_pages: Math.ceil(count / limit)
-      }
+      success: true,
+      data: formattedTherapists,
+      count: formattedTherapists.length
     });
 
   } catch (error) {
-    console.error('Error fetching specialists:', error);
-    res.status(500).json({ error: 'فشل في جلب بيانات المختصين' });
-  }
-});
-
-// GET /api/specialists/featured - المختصين المميزين
-router.get('/featured', async (req, res) => {
-  try {
-    const { data: featuredSpecialists, error } = await supabase
-      .from('therapists')
-      .select('*')
-      .eq('is_verified', true)
-      .eq('is_active', true)
-      .gte('rating', 4.5)
-      .order('rating', { ascending: false })
-      .limit(6);
-
-    if (error) throw error;
-
-    res.json({ specialists: featuredSpecialists });
-
-  } catch (error) {
-    console.error('Error fetching featured specialists:', error);
-    res.status(500).json({ error: 'فشل في جلب المختصين المميزين' });
+    console.error(' خطأ غير متوقع:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Internal server error' 
+    });
   }
 });
 
