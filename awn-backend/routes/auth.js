@@ -1,63 +1,37 @@
 const express = require('express');
 const router = express.Router();
-const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
-const { generateToken } = require('../utils/jwt');
+const { createClient } = require('@supabase/supabase-js');
+const { generateToken, authenticateToken } = require('../utils/jwt');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// نظام تسجيل المرضى
-router.post('/patient/register', async (req, res) => {
+// POST /api/auth/signup - تسجيل مستخدم جديد
+router.post('/signup', async (req, res) => {
   try {
-    const {
-      national_id,
-      first_name,
-      last_name,
-      email,
-      phone,
-      date_of_birth,
-      gender,
-      city,
-      emergency_contact,
-      password
-    } = req.body;
+    const { first_name, last_name, email, password, role = 'patient' } = req.body;
 
-    console.log('محاولة تسجيل مريض جديد:', national_id);
+    console.log('📧 بيانات التسجيل المستلمة:', req.body);
 
-    // التحقق من البيانات المطلوبة
-    if (!national_id || !first_name || !last_name || !email || !phone || !password) {
+    // التحقق من البيانات
+    if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
-        error: 'بيانات ناقصة',
-        details: 'الرقم الوطني، الاسم، البريد، الهاتف، وكلمة المرور مطلوبة'
-      });
-    }
-
-    // التحقق من عدم وجود مريض مسجل مسبقاً
-    const { data: existingPatient, error: checkError } = await supabase
-      .from('patients')
-      .select('national_id')
-      .eq('national_id', national_id)
-      .single();
-
-    if (existingPatient) {
-      return res.status(409).json({
-        success: false,
-        error: 'الرقم الوطني مسجل مسبقاً'
+        error: 'الاسم الأول، اسم العائلة، البريد الإلكتروني، وكلمة المرور مطلوبة'
       });
     }
 
     // التحقق من البريد الإلكتروني
-    const { data: existingEmail, error: emailError } = await supabase
+    const { data: existingUser, error: checkError } = await supabase
       .from('patients')
-      .select('national_id')
+      .select('email')
       .eq('email', email)
       .single();
 
-    if (existingEmail) {
+    if (existingUser) {
       return res.status(409).json({
         success: false,
         error: 'البريد الإلكتروني مسجل مسبقاً'
@@ -66,70 +40,71 @@ router.post('/patient/register', async (req, res) => {
 
     // تشفير كلمة المرور
     const hashedPassword = await bcrypt.hash(password, 10);
+    const national_id = `PAT_${Date.now()}`;
 
-    // تسجيل المريض الجديد
-    const { data: patient, error } = await supabase
+    // إدراج المستخدم الجديد
+    const { data: user, error } = await supabase
       .from('patients')
-      .insert([
-        {
-          national_id,
-          first_name,
-          last_name,
-          email,
-          phone,
-          date_of_birth,
-          gender,
-          city,
-          emergency_contact,
-          password_hash: hashedPassword,
-          login_attempts: 0,
-          account_locked: false
-        }
-      ])
+      .insert([{
+        national_id,
+        first_name,
+        last_name,
+        email,
+        phone: '0500000000',
+        password_hash: hashedPassword,
+        city: 'Riyadh',
+        gender: 'male',
+        created_at: new Date().toISOString()
+      }])
       .select()
       .single();
 
     if (error) {
-      console.error('خطأ في تسجيل المريض:', error);
-      throw error;
+      console.error(' خطأ في Supabase:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'فشل في تسجيل المستخدم',
+        details: error.message
+      });
     }
 
     // إنشاء token
     const token = generateToken({ 
-      patientId: patient.national_id,
-      type: 'patient'
+      userId: user.national_id,
+      email: user.email 
     });
 
-    console.log('تم تسجيل المريض بنجاح:', patient.national_id);
+    console.log('تم تسجيل المستخدم بنجاح:', user.email);
 
     res.status(201).json({
       success: true,
       message: 'تم تسجيل حسابك بنجاح',
       token,
-      patient: {
-        national_id: patient.national_id,
-        first_name: patient.first_name,
-        last_name: patient.last_name,
-        email: patient.email
+      user: {
+        id: user.national_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: 'patient'
       }
     });
 
   } catch (error) {
-    console.error('خطأ في تسجيل المريض:', error);
+    console.error('خطأ في تسجيل المستخدم:', error);
     res.status(500).json({
       success: false,
-      error: 'فشل في تسجيل المريض',
-      details: 'حدث خطأ غير متوقع'
+      error: 'فشل في تسجيل المستخدم',
+      details: error.message
     });
   }
 });
 
-// تسجيل دخول المريض
-router.post('/patient/login', async (req, res) => {
+// POST /api/auth/login - تسجيل دخول
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('محاولة تسجيل دخول مريض:', email);
+    console.log(' محاولة تسجيل دخول:', email);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -138,91 +113,75 @@ router.post('/patient/login', async (req, res) => {
       });
     }
 
-    // البحث عن المريض
-    const { data: patient, error } = await supabase
+    // البحث عن المستخدم
+    const { data: user, error } = await supabase
       .from('patients')
       .select('*')
-      .eq('email', email)
+      .eq('email', email.toLowerCase())
       .single();
 
-    if (error || !patient) {
+    if (error || !user) {
       return res.status(401).json({
         success: false,
         error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
       });
     }
 
-    // التحقق من حالة الحساب
-    if (patient.account_locked) {
-      return res.status(423).json({
-        success: false,
-        error: 'الحساب مغلق مؤقتاً',
-        details: 'يرجى التواصل مع الدعم الفني'
-      });
-    }
-
     // التحقق من كلمة المرور
-    const isPasswordValid = await bcrypt.compare(password, patient.password_hash);
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordValid) {
-      // زيادة عدد محاولات الدخول الفاشلة
-      const newAttempts = (patient.login_attempts || 0) + 1;
-      const shouldLockAccount = newAttempts >= 5;
-
-      await supabase
-        .from('patients')
-        .update({
-          login_attempts: newAttempts,
-          account_locked: shouldLockAccount
-        })
-        .eq('national_id', patient.national_id);
-
       return res.status(401).json({
         success: false,
-        error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-        remaining_attempts: 5 - newAttempts,
-        account_locked: shouldLockAccount
+        error: 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
       });
     }
 
-    // تسجيل الدخول الناجح - إعادة تعيين المحاولات
+    // تحديث آخر تسجيل دخول
     await supabase
       .from('patients')
       .update({
-        login_attempts: 0,
-        last_login: new Date()
+        last_login: new Date().toISOString()
       })
-      .eq('national_id', patient.national_id);
+      .eq('national_id', user.national_id);
 
     // إنشاء token
     const token = generateToken({ 
-      patientId: patient.national_id,
-      type: 'patient'
+      userId: user.national_id,
+      email: user.email 
     });
 
-    console.log('تم تسجيل الدخول بنجاح:', patient.national_id);
+    console.log(' تم تسجيل الدخول بنجاح:', user.email);
 
     res.json({
       success: true,
       message: 'تم تسجيل الدخول بنجاح',
       token,
-      patient: {
-        national_id: patient.national_id,
-        first_name: patient.first_name,
-        last_name: patient.last_name,
-        email: patient.email,
-        phone: patient.phone,
-        city: patient.city
+      user: {
+        id: user.national_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: 'patient'
       }
     });
 
   } catch (error) {
-    console.error('خطأ في تسجيل الدخول:', error);
+    console.error(' خطأ في تسجيل الدخول:', error);
     res.status(500).json({
       success: false,
       error: 'فشل في تسجيل الدخول'
     });
   }
+});
+
+// GET /api/auth/verify - التحقق من التوكن
+router.get('/verify', authenticateToken, (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Token is valid',
+    user: req.user 
+  });
 });
 
 module.exports = router;
