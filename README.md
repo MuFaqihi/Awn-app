@@ -28,7 +28,7 @@ It connects **patients and physiotherapists** for appointments and educational r
 | Rawan Albaraiki      | UX/UI Lead         | Frontend Developer  |
 | Shahad Aljahdali     | Documentation Lead | Frontend Developer  |
 | Munirh Fakihi        | Technical Lead     | Backend Developer   |
-| Donna Almadani       | Project Manager    | Backend Developer   |
+| Donna Saud       | Product Manager    | Backend Developer   |
 
 **Collaboration Tools:** WhatsApp, weekly check-ins, Google Docsm and GitHub.
 
@@ -58,7 +58,7 @@ It connects **patients and physiotherapists** for appointments and educational r
 * **Frontend:** React.js + Next.js  
 * **Backend:** Node.js + Express  
 * **Database & Auth:** Supabase (PostgreSQL)  
-* **Language:** HTML, CSS, JavaScript, TypeScript and SQL
+* **Language:** CSS, JavaScript, TypeScript and SQL
 
 
 ---
