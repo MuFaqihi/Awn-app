@@ -11,6 +11,7 @@ import { GradientSlideButton } from "@/components/ui/gradient-slide-button";
 import { RescheduleDialog } from "@/components/RescheduleDialog";
 import { Rating } from "@/components/ui/rating";
 import { getTherapistById } from "@/lib/therapists";
+import { therapists as dataTherapists } from '@/data/therapists';
 import type { Appointment } from "@/lib/types";
 import { CalendarDays, Clock, MapPin, Star, Video, Home, Filter, Lightbulb, Calendar, Users, MessageSquare, X } from "lucide-react";
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -48,16 +49,16 @@ export default function ApptsClient({ locale }: Props) {
   // State for appointments - now with cancelled appointments
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([
     {
-      id: "apt_123",
-      therapistId: "ahmed-alotaibi",
+      id: "thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       date: "2025-11-15",
       time: "10:30",
       status: "upcoming",
       kind: "home",
     },
     {
-      id: "apt_124",
-      therapistId: "sarah-alshahri",
+      id: "alaa-ahmed",
+      therapistId: "alaa-ahmed",
       date: "2025-11-20",
       time: "14:00",
       kind: "online",
@@ -65,8 +66,8 @@ export default function ApptsClient({ locale }: Props) {
       meetLink: "https://meet.google.com/abc-def-ghi",
     },
     {
-      id: "apt_125",
-      therapistId: "ahmed-alotaibi",
+      id: "khaled-habib",
+      therapistId: "khaled-habib",
       date: "2025-11-25",
       time: "16:00",
       kind: "home",
@@ -76,24 +77,24 @@ export default function ApptsClient({ locale }: Props) {
 
   const [pastAppointments, setPastAppointments] = useState<Appointment[]>([
     {
-      id: "apt_past_1",
-      therapistId: "ahmed-alotaibi",
+      id: "abdullah-alshahrani",
+      therapistId: "abdullah-alshahrani",
       date: "2025-10-20",
       time: "15:00",
       status: "completed",
       kind: "home",
     },
     {
-      id: "apt_past_2",
-      therapistId: "sarah-alshahri",
+      id: "thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       date: "2025-10-15",
       time: "11:30",
       kind: "online",
       status: "completed",
     },
     {
-      id: "apt_past_3",
-      therapistId: "ahmed-alotaibi",
+      id: "alaa-ahmed",
+      therapistId: "alaa-ahmed",
       date: "2025-10-10",
       time: "09:00",
       kind: "home",
@@ -197,7 +198,12 @@ export default function ApptsClient({ locale }: Props) {
       return;
     }
     // Redirect to therapist's profile page
-    window.location.href = `/${locale}/therapists/${appointment.therapistId}`;
+    // Start booking flow on therapist profile (match FavoritesClient behavior)
+    // The profile page sources therapists from `src/data/therapists` which may have different id casing.
+    // Try to find the canonical id there (case-insensitive match) and use it if found.
+    const matched = dataTherapists.find(t => t.id === appointment.therapistId) || dataTherapists.find(t => t.id.toLowerCase() === appointment.therapistId.toLowerCase());
+    const profileId = matched ? matched.id : appointment.therapistId;
+    window.location.href = `/${locale}/therapists/${profileId}?book=true`;
   };
 
   const formatDate = (dateString: string) => {
@@ -296,7 +302,7 @@ export default function ApptsClient({ locale }: Props) {
       key: 'booking' as keyof FeedbackRatings,
       label: ar ? "سهولة الحجز" : "Booking Experience",
       description: ar ? "كان الحجز سهلاً ومباشراً" : "Was the booking process easy?",
-      icon: "📅"
+      icon: " "
     },
     {
       key: 'communication' as keyof FeedbackRatings,
@@ -308,7 +314,7 @@ export default function ApptsClient({ locale }: Props) {
       key: 'service' as keyof FeedbackRatings,
       label: ar ? "جودة الخدمة" : "Service Quality",
       description: ar ? "جودة العلاج كانت ممتازة" : "Was the treatment effective?",
-      icon: "⭐"
+      icon: " "
     },
     {
       key: 'professionalism' as keyof FeedbackRatings,
@@ -368,7 +374,7 @@ export default function ApptsClient({ locale }: Props) {
           <div className="p-4 sm:p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="text-2xl">⭐</div>
+                <div className="text-2xl"> </div>
                 <div>
                   <h4 className="font-bold text-lg text-gray-800">
                     {ar ? "شاركنا تجربتك" : "Share Your Experience"}
@@ -391,7 +397,7 @@ export default function ApptsClient({ locale }: Props) {
           <div className="p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[60vh]">
             {feedbackSuccess[activeFeedbackId] ? (
               <div className="text-center py-8">
-                <div className="text-4xl mb-3">✅</div>
+                <div className="text-4xl mb-3"> </div>
                 <h4 className="font-bold text-lg text-green-700 mb-2">
                   {ar ? "شكراً لك!" : "Thank you!"}
                 </h4>

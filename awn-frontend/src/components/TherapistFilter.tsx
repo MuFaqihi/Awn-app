@@ -14,7 +14,7 @@ export default function TherapistFilter({
   const [gender, setGender] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [session, setSession] = useState("");
-  const isArabic = locale === "ar"; // ✅ اللغة
+  const isArabic = locale === "ar"; //   اللغة
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -41,13 +41,12 @@ export default function TherapistFilter({
           onFilter({ gender, specialty: v, session });
         }}
       >
-        <option value="">{isArabic ? "التخصص: الكل" : "Specialty: All"}</option>
-        <option value="children">{isArabic ? "أطفال" : "Children"}</option>
-        <option value="women">{isArabic ? "نساء" : "Women"}</option>
-        <option value="sports">{isArabic ? "إصابات رياضية" : "Sports"}</option>
-        <option value="neuro">{isArabic ? "عصبي" : "Neurological"}</option>
-        <option value="bones">{isArabic ? "عظام" : "Orthopedic"}</option>
-        <option value="geriatrics">{isArabic ? "مسنين" : "Geriatrics"}</option>
+      <option value="">{isArabic ? "التخصص: الكل" : "Specialty: All"}</option>
+      <option value="sports">{isArabic ? "إصابات رياضية" : "Sports"}</option>
+      <option value="general">{isArabic ? "علاج طبيعي عام" : "General Physical Therapy"}</option>
+      <option value="orthopedic">{isArabic ? "عظام" : "Orthopedic"}</option>
+      <option value="women">{isArabic ? "نساء" : "Women"}</option>
+      <option value="geriatrics">{isArabic ? "مسنين" : "Geriatrics"}</option>
       </select>
 
       <select

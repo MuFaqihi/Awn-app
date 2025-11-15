@@ -8,7 +8,7 @@ import { Search, Calendar, Heart, Users, Shield, Clock } from "lucide-react";
 export default function AboutPage({
   params,
 }: {
-  // ✅ Next.js 15: params is a Promise — unwrap with React.use()
+  //   Next.js 15: params is a Promise — unwrap with React.use()
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = use(params);
@@ -151,9 +151,10 @@ export default function AboutPage({
         <Button asChild className="bg-[#013D5B] hover:bg-[#013D5B]/90">
           <Link href={`${base}/therapists`}>{t.cta1}</Link>
         </Button>
-        <Button asChild variant="outline" className="border-teal-500 text-teal-600 hover:bg-teal-50">
-          <Link href={`${base}/signup?role=therapist`}>{t.cta2}</Link>
-        </Button>
+    <Button asChild variant="outline" className="border-teal-500 text-teal-600 hover:bg-teal-50">
+  <Link href={`${base}/job-listing`}>{t.cta2}</Link>
+</Button>
+
       </div>
     </div>
   );

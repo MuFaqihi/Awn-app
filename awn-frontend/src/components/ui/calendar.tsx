@@ -118,7 +118,65 @@ export function Calendar({ selected, onSelect, disabled, initialFocus }: Calenda
             </button>
           )
         })}
+        {/* Calendar Date Picker */}
+<div>
+  <h3 className="text-lg font-semibold mb-3">{isArabic ? "اختر اليوم" : "Select Date"}</h3>
+  
+  <div className="bg-white dark:bg-gray-700 rounded-lg border p-4">
+    <div className="text-center mb-4">
+      <div className="font-semibold text-gray-900 dark:text-white mb-2">
+        {isArabic ? "التواريخ المتاحة" : "Available Dates"}
+      </div>
+      <div className="text-sm text-gray-500">
+        {isArabic ? "اختر تاريخاً من القائمة" : "Select a date from the list"}
       </div>
     </div>
+    
+    <div className="grid grid-cols-2 gap-3">
+      {Object.keys(therapist.availability).map(date => {
+        const availableSlots = therapist.availability[date]?.[mode] || []
+        const isAvailable = availableSlots.length > 0
+        
+        return (
+          <button 
+            key={date}
+            onClick={() => isAvailable && setDateISO(date)}
+            disabled={!isAvailable}
+            className={`p-4 rounded-lg border text-center transition-all ${
+              dateISO === date 
+                ? "bg-primary text-white border-primary shadow-md" 
+                : isAvailable
+                  ? "bg-gray-50 hover:bg-gray-100 border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                  : "bg-gray-100 border-gray-200 opacity-50 cursor-not-allowed"
+            }`}
+          >
+            <div className="font-medium text-sm">
+              {new Date(date).toLocaleDateString('en-GB')}
+            </div>
+            <div className={`text-xs mt-1 ${
+              dateISO === date ? "text-white opacity-90" : "text-gray-500"
+            }`}>
+              {isAvailable 
+                ? `${availableSlots.length} ${isArabic ? "موعد" : "slots"}` 
+                : (isArabic ? "غير متاح" : "Unavailable")
+              }
+            </div>
+          </button>
+        )
+      })}
+    </div>
+    
+    {dateISO && (
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+        <div className="text-sm text-blue-700">
+          {isArabic ? "تم اختيار:" : "Selected:"} {new Date(dateISO).toLocaleDateString('en-GB')}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+      </div>
+    </div>
+    
   )
 }

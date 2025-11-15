@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, use } from "react"
+import { useState, useEffect, use, useMemo } from "react"
 import { Search, Filter, Star, MapPin, Clock, Shield, Award, Globe, Users, ChevronDown, Calendar, Heart, Video, Home } from "lucide-react"
 import { Button } from "@/components/ui/base-button"
 import { Input } from "@/components/ui/input"
@@ -9,16 +9,50 @@ import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
-import { therapists } from "@/data/therapists"
 import type { Locale } from "@/lib/i18n"
 
 interface Props {
   params: Promise<{ locale: Locale }>
 }
 
+interface Therapist {
+  id: string
+  slug: string
+  name: {
+    ar: string
+    en: string
+  }
+  image: string
+  specialties: {
+    ar: string[]
+    en: string[]
+  }
+  experience: number
+  basePrice: number
+  rating: number
+  credentials: {
+    yearsExperience: number
+    scfhsVerified: boolean
+  }
+  modes: string[]
+  city: string
+  languages: string[]
+  nextAvailable: string
+  gender: string
+  bio: {
+    ar: string
+    en: string
+  }
+}
+
 export default function TherapistsPage({ params }: Props) {
   const { locale } = use(params)
   const isArabic = locale === "ar"
+
+  //   States جديدة
+  const [therapists, setTherapists] = useState<Therapist[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   const [searchTerm, setSearchTerm] = useState("")
   const [filters, setFilters] = useState({
@@ -30,18 +64,69 @@ export default function TherapistsPage({ params }: Props) {
     priceRange: "",
     availability: ""
   })
-  const [sortBy, setSortBy] = useState("recommended")
+  const [sortBy, setSortBy] = useState("rating")
   const [showFilters, setShowFilters] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Filter logic with updated data structure
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  //   جلب جميع المعالجين من الباك إند
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        setLoading(true)
+        console.log('📡 جلب بيانات المعالجين من الباك إند...')
+        
+        const response = await fetch('http://localhost:5000/api/therapists')
+        
+        if (!response.ok) {
+          throw new Error('فشل في جلب بيانات المعالجين')
+        }
+        
+        const result = await response.json()
+        console.log('  استجابة الباك إند:', result)
+        
+        if (result.success && Array.isArray(result.data)) {
+          setTherapists(result.data)
+          console.log(`  تم جلب ${result.data.length} معالج بنجاح`)
+        } else {
+          console.warn('⚠️ البيانات ليست بالشكل المتوقع:', result)
+          setTherapists([])
+        }
+        
+      } catch (err) {
+        console.error(' خطأ في جلب بيانات المعالجين:', err)
+        setError('فشل في تحميل بيانات المعالجين')
+        setTherapists([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTherapists()
+  }, [])
+
+  //   Filter logic مع البيانات من الباك إند
   const filteredTherapists = useMemo(() => {
-    let filtered = therapists.filter((therapist: any) => {
+    let filtered = therapists.filter((therapist) => {
       const nameMatch = therapist.name[locale].toLowerCase().includes(searchTerm.toLowerCase())
-      const specialtyMatch = !filters.specialty || filters.specialty === "all" || therapist.specialties.includes(filters.specialty)
-      const genderMatch = !filters.gender || filters.gender === "all" || therapist.gender === filters.gender
-      const sessionMatch = !filters.session || filters.session === "all" || therapist.modes.includes(filters.session as any)
-      const languageMatch = !filters.language || filters.language === "all" || therapist.languages.includes(filters.language)
-      const cityMatch = !filters.city || filters.city === "all" || therapist.city === filters.city
+      const specialtyMatch = !filters.specialty || 
+        filters.specialty === "all" || 
+        therapist.specialties[locale]?.includes(filters.specialty)
+      const genderMatch = !filters.gender || 
+        filters.gender === "all" || 
+        therapist.gender === filters.gender
+      const sessionMatch = !filters.session || 
+        filters.session === "all" || 
+        therapist.modes.includes(filters.session)
+      const languageMatch = !filters.language || 
+        filters.language === "all" || 
+        therapist.languages.includes(filters.language)
+      const cityMatch = !filters.city || 
+        filters.city === "all" || 
+        therapist.city === filters.city
 
       return nameMatch && specialtyMatch && genderMatch && sessionMatch && languageMatch && cityMatch
     })
@@ -49,30 +134,67 @@ export default function TherapistsPage({ params }: Props) {
     // Sort logic
     switch (sortBy) {
       case "experience":
-        return filtered.sort((a: any, b: any) => b.credentials.yearsExperience - a.credentials.yearsExperience)
+        return filtered.sort((a, b) => b.credentials.yearsExperience - a.credentials.yearsExperience)
       case "price-low":
-        return filtered.sort((a: any, b: any) => a.basePrice - b.basePrice)
+        return filtered.sort((a, b) => a.basePrice - b.basePrice)
       case "price-high":
-        return filtered.sort((a: any, b: any) => b.basePrice - a.basePrice)
+        return filtered.sort((a, b) => b.basePrice - a.basePrice)
       case "rating":
-        return filtered.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
+        return filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
       case "availability":
-        return filtered.sort((a: any, b: any) => new Date(a.nextAvailable).getTime() - new Date(b.nextAvailable).getTime())
+        return filtered.sort((a, b) => new Date(a.nextAvailable).getTime() - new Date(b.nextAvailable).getTime())
       default:
         return filtered
     }
   }, [therapists, searchTerm, filters, sortBy, locale])
 
-  // Get unique values for filter options
-  const specialties = [...new Set(therapists.flatMap((t: any) => t.specialties))]
-  const cities = [...new Set(therapists.map((t: any) => t.city))]
-  const languages = [...new Set(therapists.flatMap((t: any) => t.languages))]
+  //   Get unique values for filter options
+  const specialties = [...new Set(therapists.flatMap(t => t.specialties[locale] || []))]
+  const cities = [...new Set(therapists.map(t => t.city))]
+  const languages = [...new Set(therapists.flatMap(t => t.languages))]
+
+  //   شاشة التحميل
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">
+            {isArabic ? "جاري تحميل بيانات المعالجين..." : "Loading therapists..."}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  //   شاشة الخطأ
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className="text-center">
+          <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {isArabic ? "حدث خطأ" : "Error"}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 max-w-md">
+            {error}
+          </p>
+          <Button 
+            onClick={() => window.location.reload()}
+            className="bg-primary hover:bg-primary/90"
+          >
+            {isArabic ? "إعادة المحاولة" : "Try Again"}
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto p-4 space-y-6">
         
-        {/* Header - Same Style as Other Cards */}
+        {/* Header */}
         <Card className="p-8 bg-white border shadow-sm">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-gray-900">
@@ -109,7 +231,7 @@ export default function TherapistsPage({ params }: Props) {
               <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
             </Button>
 
-            {/* Sort Options - Remove Recommended */}
+            {/* Sort Options */}
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-48 bg-white border-gray-200">
                 <SelectValue placeholder={isArabic ? "ترتيب حسب" : "Sort by"} />
@@ -132,7 +254,7 @@ export default function TherapistsPage({ params }: Props) {
                 </SelectTrigger>
                 <SelectContent className="bg-white border-gray-200">
                   <SelectItem value="all">{isArabic ? "كل التخصصات" : "All Specialties"}</SelectItem>
-                  {specialties.map((specialty: string) => (
+                  {specialties.map((specialty) => (
                     <SelectItem key={specialty} value={specialty}>{specialty}</SelectItem>
                   ))}
                 </SelectContent>
@@ -166,7 +288,7 @@ export default function TherapistsPage({ params }: Props) {
                 </SelectTrigger>
                 <SelectContent className="bg-white border-gray-200">
                   <SelectItem value="all">{isArabic ? "كل المدن" : "All Cities"}</SelectItem>
-                  {cities.map((city: string) => (
+                  {cities.map((city) => (
                     <SelectItem key={city} value={city}>{city}</SelectItem>
                   ))}
                 </SelectContent>
@@ -186,20 +308,23 @@ export default function TherapistsPage({ params }: Props) {
         {/* Results Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-gray-900">
-            {isArabic ? "المعالجون المتاحون" : "Available Therapists"}
+            {isArabic ? "المعالجون المتاحون" : "Available Therapists"} 
+            <span className="text-gray-500 text-lg ml-2">
+              ({filteredTherapists.length})
+            </span>
           </h2>
         </div>
 
         {/* Enhanced Therapist Cards Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTherapists.map((therapist: any) => (
+          {filteredTherapists.map((therapist) => (
             <Card key={therapist.id} className="group hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden border shadow-sm bg-white">
               
               {/* Image */}
               <div className="relative">
                 <div className="aspect-[4/3] relative overflow-hidden">
                   <Image
-                    src={therapist.image}
+                    src={therapist.image || "/avatar-placeholder.jpg"}
                     alt={therapist.name[locale]}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -242,14 +367,14 @@ export default function TherapistsPage({ params }: Props) {
 
                 {/* Specialties */}
                 <div className="flex flex-wrap gap-1">
-                  {therapist.specialties.slice(0, 3).map((specialty: string) => (
+                  {(therapist.specialties[locale] || []).slice(0, 3).map((specialty: string) => (
                     <Badge key={specialty} variant="secondary" className="text-xs bg-gray-100 text-gray-700">
                       {specialty}
                     </Badge>
                   ))}
-                  {therapist.specialties.length > 3 && (
+                  {(therapist.specialties[locale] || []).length > 3 && (
                     <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-600">
-                      +{therapist.specialties.length - 3}
+                      +{(therapist.specialties[locale] || []).length - 3}
                     </Badge>
                   )}
                 </div>
@@ -264,7 +389,7 @@ export default function TherapistsPage({ params }: Props) {
                   ))}
                 </div>
 
-                {/* Location & Languages */}
+                {/*   Location & Languages - مصحح */}
                 <div className="flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center gap-1">
                     <MapPin className="w-4 h-4" />
@@ -272,7 +397,10 @@ export default function TherapistsPage({ params }: Props) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Globe className="w-4 h-4" />
-                    {therapist.languages.slice(0, 2).join(", ")}
+                    {/*   التصحيح: التحقق من أن languages مصفوفة قبل استخدام slice */}
+                    {Array.isArray(therapist.languages) 
+                      ? therapist.languages.slice(0, 2).join(", ")
+                      : "العربية, English" /* قيمة افتراضية إذا لم تكن مصفوفة */}
                   </div>
                 </div>
 
@@ -280,7 +408,8 @@ export default function TherapistsPage({ params }: Props) {
                 <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
                   <Calendar className="w-4 h-4 text-green-600" />
                   <span className="text-sm text-green-700">
-                    {isArabic ? "متاح" : "Available"} {new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB")}
+                    {isArabic ? "متاح" : "Available"}{' '}
+                    {mounted ? new Date(therapist.nextAvailable).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB") : ''}
                   </span>
                 </div>
 
@@ -309,7 +438,7 @@ export default function TherapistsPage({ params }: Props) {
         </div>
 
         {/* No Results */}
-        {filteredTherapists.length === 0 && (
+        {filteredTherapists.length === 0 && therapists.length > 0 && (
           <Card className="text-center py-16 bg-white">
             <Users className="mx-auto w-16 h-16 text-gray-300 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -327,6 +456,19 @@ export default function TherapistsPage({ params }: Props) {
             >
               {isArabic ? "إعادة تعيين البحث" : "Reset Search"}
             </Button>
+          </Card>
+        )}
+
+        {/* No Therapists at all */}
+        {therapists.length === 0 && !loading && (
+          <Card className="text-center py-16 bg-white">
+            <Users className="mx-auto w-16 h-16 text-gray-300 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {isArabic ? "لا يوجد معالجون" : "No Therapists"}
+            </h3>
+            <p className="text-gray-500 text-lg mb-6">
+              {isArabic ? "لا توجد بيانات معالجين متاحة حالياً" : "No therapist data available at the moment"}
+            </p>
           </Card>
         )}
       </div>

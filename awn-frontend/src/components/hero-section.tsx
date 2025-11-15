@@ -32,7 +32,7 @@ const content = {
       },
     ],
     toTherapists: (l: string) => `/${l}/therapists`,
-    toTherapistLogin: (l: string) => `/${l}/therapist-login`, // ✅ Fixed URL
+    toTherapistLogin: (l: string) => `/${l}/therapist-login`, //   Fixed URL
   },
   en: {
     title: 'Book trusted physiotherapy with ease',

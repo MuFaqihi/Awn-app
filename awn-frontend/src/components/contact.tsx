@@ -24,22 +24,63 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
   const isAr = locale === "ar";
   const dir = isAr ? "rtl" : "ltr";
 
-  // controlled selects (so we can re-open without jumping around)
+  // controlled selects
   const [role, setRole] = React.useState<string>("");
   const [city, setCity] = React.useState<string>("");
   const [topic, setTopic] = React.useState<string>("");
 
-  // simple submit shim
+  // form state
   const [submitting, setSubmitting] = React.useState(false);
   const [sent, setSent] = React.useState(false);
+  const [error, setError] = React.useState<string>("");
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
-    // TODO: wire to backend
-    setTimeout(() => {
+    setError("");
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      
+      // تحضير البيانات للإرسال
+      const contactData = {
+        first_name: formData.get("firstName") as string,
+        last_name: formData.get("lastName") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string || "",
+        role: role,
+        city: city,
+        topic: topic,
+        message: formData.get("message") as string,
+        locale: locale
+      };
+//هنا الاتصال مع الباك عبر الرابط
+      const response = await fetch('https://awn-backend.vercel.app/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactData)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSent(true);
+        // إعادة تعيين الحقول
+        setRole("");
+        setCity("");
+        setTopic("");
+        e.currentTarget.reset();
+      } else {
+        setError(isAr ? "فشل في إرسال الرسالة، يرجى المحاولة مرة أخرى" : "Failed to send message, please try again");
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setError(isAr ? "حدث خطأ في الإرسال" : "An error occurred while sending");
+    } finally {
       setSubmitting(false);
-      setSent(true);
-    }, 900);
+    }
   }
 
   return (
@@ -69,13 +110,23 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                 <Label htmlFor="name" className="text-sm">
                   {isAr ? "الاسم الأول" : "First name"}
                 </Label>
-                <Input id="name" name="firstName" required />
+                <Input 
+                  id="name" 
+                  name="firstName" 
+                  required 
+                  disabled={submitting}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last" className="text-sm">
                   {isAr ? "اسم العائلة" : "Last name"}
                 </Label>
-                <Input id="last" name="lastName" required />
+                <Input 
+                  id="last" 
+                  name="lastName" 
+                  required 
+                  disabled={submitting}
+                />
               </div>
             </div>
 
@@ -91,6 +142,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                   type="email"
                   required
                   placeholder="name@example.com"
+                  disabled={submitting}
                 />
               </div>
               <div className="space-y-2">
@@ -102,18 +154,19 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                   name="phone"
                   inputMode="tel"
                   placeholder={isAr ? "05xxxxxxxx" : "+966 5x xxx xxxx"}
+                  disabled={submitting}
                 />
               </div>
             </div>
 
-            {/* 3 selects in two rows; Select uses popper so it won't cover inputs */}
+            {/* 3 selects in two rows */}
             <div className="grid gap-4 sm:grid-cols-2">
               {/* Role */}
               <div className="space-y-2">
                 <Label className="text-sm">
                   {isAr ? "أنت" : "You are a"}
                 </Label>
-                <Select value={role} onValueChange={setRole}>
+                <Select value={role} onValueChange={setRole} disabled={submitting}>
                   <SelectTrigger>
                     <SelectValue
                       placeholder={isAr ? "اختر دورك" : "Select your role"}
@@ -130,7 +183,6 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                     <SelectItem value="therapist">
                       {isAr ? "أخصائي علاج طبيعي" : "Physiotherapist"}
                     </SelectItem>
-                    
                     <SelectItem value="other">
                       {isAr ? "أخرى" : "Other"}
                     </SelectItem>
@@ -143,7 +195,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                 <Label className="text-sm">
                   {isAr ? "المدينة/المنطقة" : "City / Region"}
                 </Label>
-                <Select value={city} onValueChange={setCity}>
+                <Select value={city} onValueChange={setCity} disabled={submitting}>
                   <SelectTrigger>
                     <SelectValue
                       placeholder={isAr ? "اختر المدينة" : "Select city"}
@@ -190,7 +242,7 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                 <Label className="text-sm">
                   {isAr ? "نوع الاستفسار" : "Inquiry type"}
                 </Label>
-                <Select value={topic} onValueChange={setTopic}>
+                <Select value={topic} onValueChange={setTopic} disabled={submitting}>
                   <SelectTrigger>
                     <SelectValue
                       placeholder={isAr ? "اختر نوع الاستفسار" : "Select a topic"}
@@ -207,7 +259,6 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                     <SelectItem value="verification">
                       {isAr ? "توثيق الأخصائيين" : "Therapist verification"}
                     </SelectItem>
-                    
                     <SelectItem value="pricing">
                       {isAr ? "الأسعار والباقات" : "Pricing & plans"}
                     </SelectItem>
@@ -234,6 +285,8 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
                     ? "اكتب تفاصيل الاستفسار أو المشكلة باختصار..."
                     : "Briefly describe your question or issue…"
                 }
+                disabled={submitting}
+                required
               />
             </div>
 
@@ -255,11 +308,18 @@ export default function ContactSection({ locale = "ar" }: { locale?: Locale }) {
               </Button>
             </div>
 
+            {/* رسائل النتيجة */}
             {sent && (
               <p className="text-sm text-green-600">
                 {isAr
                   ? "تم استلام رسالتك وسنعاود التواصل معك قريبًا."
                   : "Your message has been sent. We'll get back to you soon."}
+              </p>
+            )}
+
+            {error && (
+              <p className="text-sm text-red-600">
+                {error}
               </p>
             )}
           </form>

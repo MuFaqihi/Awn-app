@@ -25,8 +25,8 @@ export default function PlansClient({ locale }: { locale: Locale }) {
   
   const [plans, setPlans] = React.useState<TreatmentPlan[]>([
     {
-      id: "plan_aa",
-      therapistId: "ahmed-alotaibi",
+      id: "thamer-alshahrani",
+      therapistId: "thamer-alshahrani",
       title: ar ? "خطة علاج إصابة الكتف" : "Shoulder Injury Treatment Plan",
       steps: [
         ar ? "جلسة تقييم أولية" : "Initial assessment session",
@@ -39,8 +39,8 @@ export default function PlansClient({ locale }: { locale: Locale }) {
       createdAt: "2025-11-01",
     },
     {
-      id: "plan_bb",
-      therapistId: "sarah-alshahri",
+      id: "abdullah-alshahrani",
+      therapistId: "abdullah-alshahrani",
       title: ar ? "برنامج تأهيل الركبة" : "Knee Rehabilitation Program",
       steps: [
         ar ? "جلسة تقييم شامل للركبة" : "Comprehensive knee assessment session",
@@ -54,7 +54,7 @@ export default function PlansClient({ locale }: { locale: Locale }) {
       createdAt: "2025-10-25",
     },
     {
-      id: "plan_cc",
+      id: "alaa-ahmed",
       therapistId: "faisal-almutairi",
       title: ar ? "خطة علاج الظهر" : "Back Pain Treatment Plan",
       steps: [
@@ -477,15 +477,7 @@ export default function PlansClient({ locale }: { locale: Locale }) {
           <div className="space-y-3 mt-auto">
             {plan.status === 'proposed' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Button
-                  onClick={() => handleContactTherapist(plan.therapistId)}
-                  variant="outline"
-                  size="sm"
-                  className="transition-all duration-200 hover:scale-105 active:scale-95 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 hover:shadow-lg w-full"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  {ar ? "تواصل" : "Contact"}
-                </Button>
+                
 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -551,18 +543,9 @@ export default function PlansClient({ locale }: { locale: Locale }) {
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-              </div>
-            ) : (
-              <Button
-                onClick={() => handleContactTherapist(plan.therapistId)}
-                variant="outline"
-                size="sm"
-                className="transition-all duration-200 hover:scale-105 active:scale-95 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 hover:shadow-lg w-full"
-              >
-                <User className="h-4 w-4 mr-2" />
-                {ar ? "تواصل مع المعالج" : "Contact Therapist"}
-              </Button>
-            )}
+                      </div>
+              ) : null}
+
           </div>
         </div>
       </Card>
